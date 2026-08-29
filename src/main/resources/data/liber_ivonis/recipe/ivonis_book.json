@@ -1,0 +1,12 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": ["ABA", "CDC", "AEA"],
+  "key": {
+    "A": {"item": "minecraft:leather"},
+    "B": {"item": "minecraft:book"},
+    "C": {"item": "minecraft:gold_ingot"},
+    "D": {"item": "minecraft:ender_eye"},
+    "E": {"item": "minecraft:ink_sac"}
+  },
+  "result": {"id": "liber_ivonis:ivonis_book", "count": 1}
+}
