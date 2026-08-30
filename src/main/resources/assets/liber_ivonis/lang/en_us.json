@@ -21,6 +21,8 @@
   "entry.liber_ivonis.inventory.description": "View player inventory",
   "entry.liber_ivonis.advancement": "Advancements",
   "entry.liber_ivonis.advancement.description": "View your advancements",
+  "entry.liber_ivonis.controls": "Key Bindings",
+  "entry.liber_ivonis.controls.description": "Configure controls",
   "entry.liber_ivonis.configured_handbook.description": "Configured handbook",
   "entry.liber_ivonis.configured_screen.description": "Configured screen"
 }

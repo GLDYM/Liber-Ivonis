@@ -17,7 +17,7 @@ public final class IvonisConfig {
         b.push("hub");
         showUnavailable = b.comment("Show entries whose optional mod is not installed").define("showUnavailable", false);
         builtinEntries = b.comment("Built-in Hub entries, in display order. Format: id|category (category optional). Available ids: ftbquests, patchouli, modonomicon, guideme, ageratum, inventory, advancement")
-                .defineListAllowEmpty("builtinEntries", List.of("ftbquests", "patchouli", "modonomicon", "guideme", "ageratum", "inventory", "advancement"),
+                .defineListAllowEmpty("builtinEntries", List.of("ftbquests", "patchouli", "modonomicon", "guideme", "ageratum", "inventory", "advancement", "controls"),
                         v -> v instanceof String && !((String) v).isBlank());
         b.pop();
         b.push("handbooks");

@@ -116,8 +116,15 @@ public final class IvonisHubFragment extends Fragment {
         close.setTextSize(14);
         close.setTextColor(ACCENT);
         close.setBackground(cardBackground(true));
+        // Keep the action comfortably wide even when the translated label is short.
+        // The MATCH_PARENT layout below makes it span the complete content width.
+        close.setMinWidth(dp(close, 240));
         close.setOnClickListener(view -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
-        root.addView(close, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 14, 0, 0));
+        LinearLayout.LayoutParams closeParams = marginParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT,
+                0, 14, 0, 0);
+        root.addView(close, closeParams);
         // Use ordinary parent measurement. A fixed-width child inside a full-screen
         // ModernUI root can produce invalid GL viewport/scissor measurements on some
         // drivers. The horizontal padding provides the visual content width while

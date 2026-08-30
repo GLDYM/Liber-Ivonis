@@ -21,6 +21,8 @@
   "entry.liber_ivonis.inventory.description": "查看玩家物品栏",
   "entry.liber_ivonis.advancement": "成就",
   "entry.liber_ivonis.advancement.description": "查看游戏成就",
+  "entry.liber_ivonis.controls": "按键绑定",
+  "entry.liber_ivonis.controls.description": "配置游戏按键",
   "entry.liber_ivonis.configured_handbook.description": "配置的教程手册",
   "entry.liber_ivonis.configured_screen.description": "配置的界面"
 }
