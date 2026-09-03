@@ -17,6 +17,7 @@ NeoForge 1.21.1 的多模组界面入口。右键使用伊波恩之书打开暗�
 [hub]
 showUnavailable = false
 builtinEntries = ["ftbquests", "patchouli|key:examplemod.category.adventure", "inventory"]
+entryOrder = ["patchouli", "item:examplemod:guide_book", "custom:com.example.client.ExampleScreen", "inventory"]
 
 [handbooks]
 handbookItems = ["examplemod:guide_book|示例手册|key:examplemod.category.adventure"]

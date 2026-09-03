@@ -38,7 +38,7 @@ public final class HubEntries {
         for (String value : IvonisConfig.builtinEntries.get()) {
             String[] spec = value.split("\\|", 2);
             HubEntry entry = builtins.get(spec[0].trim());
-            if (entry != null && (entry.available() || IvonisConfig.showUnavailable.get())) {
+            if (entry != null && entry.available()) {
                 String category = spec.length > 1 ? spec[1].trim() : "";
                 result.add(category.isEmpty() ? entry : new HubEntry(entry.id(), entry.title(), entry.subtitle(), entry.action(), entry.available(), category));
             }
@@ -53,9 +53,30 @@ public final class HubEntries {
                 result.add(new HubEntry("item:" + p[0], title, Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item), true, category));
             }
         }
-        // Keep uncategorized entries at the top, then render each category as a group.
+        return applyConfiguredOrder(result);
+    }
+
+    private static List<HubEntry> applyConfiguredOrder(List<HubEntry> entries) {
+        List<? extends String> configuredOrder = IvonisConfig.entryOrder.get();
+        if (configuredOrder.isEmpty()) return groupByCategory(entries);
+
+        Map<String, HubEntry> byId = new LinkedHashMap<>();
+        for (HubEntry entry : entries) byId.putIfAbsent(entry.id(), entry);
+
+        List<HubEntry> ordered = new ArrayList<>();
+        for (String value : configuredOrder) {
+            HubEntry entry = byId.remove(value.trim());
+            if (entry != null) ordered.add(entry);
+        }
+        // Keep newly discovered integrations and configured entries visible even when
+        // an existing config has not yet added them to entryOrder.
+        ordered.addAll(byId.values());
+        return ordered;
+    }
+
+    private static List<HubEntry> groupByCategory(List<HubEntry> entries) {
         Map<String, List<HubEntry>> groups = new LinkedHashMap<>();
-        for (HubEntry entry : result) groups.computeIfAbsent(entry.category(), ignored -> new ArrayList<>()).add(entry);
+        for (HubEntry entry : entries) groups.computeIfAbsent(entry.category(), ignored -> new ArrayList<>()).add(entry);
         List<HubEntry> ordered = new ArrayList<>();
         List<HubEntry> ungrouped = groups.remove("");
         if (ungrouped != null) ordered.addAll(ungrouped);
@@ -66,15 +87,21 @@ public final class HubEntries {
     private static Map<String, HubEntry> builtins() {
         Map<String, HubEntry> entries = new LinkedHashMap<>();
         entries.put("ftbquests", new HubEntry("ftbquests", Component.translatable("entry.liber_ivonis.ftbquests"), Component.translatable("entry.liber_ivonis.ftbquests.description"), () -> FtbQuestsCompat.open(), ModList.get().isLoaded("ftbquests")));
-        entries.put("patchouli", new HubEntry("patchouli", Component.translatable("entry.liber_ivonis.patchouli"), Component.translatable("entry.liber_ivonis.patchouli.description"), openCategory("patchouli", "entry.liber_ivonis.patchouli", PatchouliCompat.entries()), ModList.get().isLoaded("patchouli")));
-        entries.put("modonomicon", new HubEntry("modonomicon", Component.translatable("entry.liber_ivonis.modonomicon"), Component.translatable("entry.liber_ivonis.modonomicon.description"), openCategory("modonomicon", "entry.liber_ivonis.modonomicon", ModonomiconCompat.entries()), ModList.get().isLoaded("modonomicon")));
-        entries.put("guideme", new HubEntry("guideme", Component.translatable("entry.liber_ivonis.guideme"), Component.translatable("entry.liber_ivonis.guideme.description"), openCategory("guideme", "entry.liber_ivonis.guideme", GuideMeCompat.entries()), ModList.get().isLoaded("guideme")));
-        entries.put("ageratum", new HubEntry("ageratum", Component.translatable("entry.liber_ivonis.ageratum"), Component.translatable("entry.liber_ivonis.ageratum.description"), openCategory("ageratum", "entry.liber_ivonis.ageratum", List.of(new HandbookEntry(Component.translatable("entry.liber_ivonis.ageratum"), AgeratumCompat::open))), ModList.get().isLoaded("ageratum")));
+        boolean patchouliLoaded = ModList.get().isLoaded("patchouli");
+        entries.put("patchouli", new HubEntry("patchouli", Component.translatable("entry.liber_ivonis.patchouli"), Component.translatable("entry.liber_ivonis.patchouli.description"), openCategory("patchouli", "entry.liber_ivonis.patchouli", patchouliLoaded ? PatchouliCompat.entries() : List.of()), patchouliLoaded));
+        boolean modonomiconLoaded = ModList.get().isLoaded("modonomicon");
+        entries.put("modonomicon", new HubEntry("modonomicon", Component.translatable("entry.liber_ivonis.modonomicon"), Component.translatable("entry.liber_ivonis.modonomicon.description"),
+                openCategory("modonomicon", "entry.liber_ivonis.modonomicon", modonomiconLoaded ? ModonomiconCompat.entries() : List.of()), modonomiconLoaded));
+        boolean guideMeLoaded = ModList.get().isLoaded("guideme");
+        entries.put("guideme", new HubEntry("guideme", Component.translatable("entry.liber_ivonis.guideme"), Component.translatable("entry.liber_ivonis.guideme.description"), openCategory("guideme", "entry.liber_ivonis.guideme", guideMeLoaded ? GuideMeCompat.entries() : List.of()), guideMeLoaded));
+        boolean ageratumLoaded = ModList.get().isLoaded("ageratum");
+        entries.put("ageratum", new HubEntry("ageratum", Component.translatable("entry.liber_ivonis.ageratum"), Component.translatable("entry.liber_ivonis.ageratum.description"), openCategory("ageratum", "entry.liber_ivonis.ageratum", ageratumLoaded ? List.of(new HandbookEntry(Component.translatable("entry.liber_ivonis.ageratum"), AgeratumCompat::open)) : List.of()), ageratumLoaded));
         entries.put("inventory", new HubEntry("inventory", Component.translatable("entry.liber_ivonis.inventory"), Component.translatable("entry.liber_ivonis.inventory.description"), openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), true));
         entries.put("advancement", new HubEntry("advancement", Component.translatable("entry.liber_ivonis.advancement"), Component.translatable("entry.liber_ivonis.advancement.description"), openNative(() -> new AdvancementsScreen(Minecraft.getInstance().player.connection.getAdvancements())), true));
         entries.put("controls", new HubEntry("controls", Component.translatable("entry.liber_ivonis.controls"), Component.translatable("entry.liber_ivonis.controls.description"), openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), true));
         return entries;
     }
+
 
     private static void addConfiguredScreens(List<HubEntry> out) {
         for (String value : IvonisConfig.customScreens.get()) {
@@ -94,7 +121,7 @@ public final class HubEntries {
 
     private static void optional(List<HubEntry> out, String mod, String titleKey, String subtitleKey, Supplier<Runnable> opener) {
         boolean available = ModList.get().isLoaded(mod);
-        if (available || IvonisConfig.showUnavailable.get()) out.add(new HubEntry(mod, Component.translatable(titleKey), Component.translatable(subtitleKey), opener.get(), available));
+        if (available) out.add(new HubEntry(mod, Component.translatable(titleKey), Component.translatable(subtitleKey), opener.get(), true));
     }
 
     private static Screen useHandbook(String id) {
