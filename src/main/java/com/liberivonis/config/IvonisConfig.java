@@ -12,11 +12,16 @@ public final class IvonisConfig {
     static {
         ModConfigSpec.Builder b = new ModConfigSpec.Builder();
         b.push("hub");
-        hubEntries = b.comment("Hub entries in display order. Built-in: id|category. Handbook: item:modid:item_id|title|category. Screen: screen:title|class|method|category")
-                .defineListAllowEmpty("entries", List.of("ftbquests", "patchouli", "modonomicon", "guideme", "ageratum", "inventory", "advancement", "controls"),
+        hubEntries = b.comment(
+                "Hub entries in display order. Built-in: id|category. Handbook: item:modid:item_id|title|category. Screen: screen:title|class|method|category")
+                .defineListAllowEmpty("entries",
+                        List.of("ftbquests", "patchouli", "modonomicon", "guideme", "ageratum", "inventory",
+                                "advancement", "controls"),
                         v -> v instanceof String && !((String) v).isBlank());
         b.pop();
         SPEC = b.build();
     }
-    private IvonisConfig() {}
+
+    private IvonisConfig() {
+    }
 }

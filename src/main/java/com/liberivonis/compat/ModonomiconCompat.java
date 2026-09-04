@@ -10,11 +10,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class ModonomiconCompat {
-    private ModonomiconCompat() {}
+    private ModonomiconCompat() {
+    }
+
     public static List<HandbookEntry> entries() {
         List<HandbookEntry> result = new ArrayList<>();
         for (Book book : BookDataManager.get().getBooks().values()) {
-            Component title = book.getName() == null ? Component.literal(book.getId().toString()) : Component.translatable(book.getName());
+            Component title = book.getName() == null ? Component.literal(book.getId().toString())
+                    : Component.translatable(book.getName());
             result.add(new HandbookEntry(title, () -> BookGuiManager.get().openBook(BookAddress.defaultFor(book))));
         }
         return result;

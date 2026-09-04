@@ -20,6 +20,7 @@ public final class LiberIvonis {
     }
 
     private void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
-        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) event.accept(ModItems.IVONIS_BOOK);
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES)
+            event.accept(ModItems.IVONIS_BOOK);
     }
 }

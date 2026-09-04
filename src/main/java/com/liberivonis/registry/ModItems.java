@@ -9,7 +9,9 @@ import net.neoforged.neoforge.registries.DeferredItem;
 
 public final class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(LiberIvonis.MOD_ID);
-    public static final DeferredItem<Item> IVONIS_BOOK = ITEMS.register("ivonis_book", () -> new IvonisBookItem(new Item.Properties().stacksTo(1)));
+    public static final DeferredItem<Item> IVONIS_BOOK = ITEMS.register("ivonis_book",
+            () -> new IvonisBookItem(new Item.Properties().stacksTo(1)));
 
-    private ModItems() {}
+    private ModItems() {
+    }
 }

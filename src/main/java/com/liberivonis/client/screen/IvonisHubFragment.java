@@ -28,7 +28,8 @@ public final class IvonisHubFragment extends Fragment {
     private static final int OUTLINE = 0xFF364255;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, icyllis.modernui.util.DataSet savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+            icyllis.modernui.util.DataSet savedInstanceState) {
         Context context = requireContext();
 
         LinearLayout root = new LinearLayout(context);
@@ -37,10 +38,12 @@ public final class IvonisHubFragment extends Fragment {
         root.setBackground(new ColorDrawable(BG));
 
         TextView title = text(context, Component.translatable("screen.liber_ivonis.hub"), 22, ACCENT);
-        root.addView(title, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 3));
+        root.addView(title,
+                marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 3));
 
         TextView subtitle = text(context, Component.translatable("screen.liber_ivonis.subtitle"), 13, MUTED);
-        root.addView(subtitle, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 16));
+        root.addView(subtitle,
+                marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 16));
 
         ScrollView scroll = new ScrollView(context);
         scroll.setFillViewport(true);
@@ -48,7 +51,8 @@ public final class IvonisHubFragment extends Fragment {
         LinearLayout list = new LinearLayout(context);
         list.setOrientation(LinearLayout.VERTICAL);
         java.util.List<LinearLayout> rows = new java.util.ArrayList<>();
-        scroll.addView(list, new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        scroll.addView(list,
+                new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         java.util.List<HubEntry> entries = HubEntries.collect();
         String category = null;
@@ -63,13 +67,15 @@ public final class IvonisHubFragment extends Fragment {
                 previous = null;
                 if (!category.isEmpty()) {
                     TextView heading = text(context, categoryTitle(category), 15, ACCENT);
-                    list.addView(heading, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 2, 8, 0, 6));
+                    list.addView(heading, marginParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                            ViewGroup.LayoutParams.WRAP_CONTENT, 2, 8, 0, 6));
                 }
             }
             if (column == 0) {
                 row = new LinearLayout(context);
                 row.setOrientation(LinearLayout.HORIZONTAL);
-                list.addView(row, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 8));
+                list.addView(row, marginParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT,
+                        0, 0, 0, 8));
                 rows.add(row);
             }
 
@@ -84,7 +90,8 @@ public final class IvonisHubFragment extends Fragment {
             button.setMinHeight(dp(button, 48));
             button.setBackground(cardBackground(entry.available()));
             button.setOnClickListener(view -> open(entry));
-            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1);
+            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT, 1);
             buttonParams.setMargins(column == 0 ? 0 : 4, 0, column == 0 ? 4 : 0, 0);
             row.addView(button, buttonParams);
             previous = button;
@@ -99,8 +106,10 @@ public final class IvonisHubFragment extends Fragment {
         root.post(() -> {
             for (LinearLayout itemRow : rows) {
                 int height = 0;
-                for (int i = 0; i < itemRow.getChildCount(); i++) height = Math.max(height, itemRow.getChildAt(i).getMeasuredHeight());
-                if (height <= 0) continue;
+                for (int i = 0; i < itemRow.getChildCount(); i++)
+                    height = Math.max(height, itemRow.getChildAt(i).getMeasuredHeight());
+                if (height <= 0)
+                    continue;
                 itemRow.getLayoutParams().height = height;
                 for (int i = 0; i < itemRow.getChildCount(); i++) {
                     View child = itemRow.getChildAt(i);
@@ -119,7 +128,8 @@ public final class IvonisHubFragment extends Fragment {
         // Keep the action comfortably wide even when the translated label is short.
         // The MATCH_PARENT layout below makes it span the complete content width.
         close.setMinWidth(dp(close, 240));
-        close.setOnClickListener(view -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
+        close.setOnClickListener(
+                view -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
         LinearLayout.LayoutParams closeParams = marginParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT,
@@ -137,7 +147,8 @@ public final class IvonisHubFragment extends Fragment {
 
     private static void open(HubEntry entry) {
         Minecraft.getInstance().execute(() -> {
-            if (entry.id().equals("patchouli") || entry.id().equals("modonomicon") || entry.id().equals("guideme") || entry.id().equals("ageratum")) {
+            if (entry.id().equals("patchouli") || entry.id().equals("modonomicon") || entry.id().equals("guideme")
+                    || entry.id().equals("ageratum")) {
                 entry.action().run();
             } else {
                 HubNavigation.openAction(entry.action());
@@ -173,11 +184,14 @@ public final class IvonisHubFragment extends Fragment {
         return shape;
     }
 
-    private static LinearLayout.LayoutParams marginParams(int width, int height, int left, int top, int right, int bottom) {
+    private static LinearLayout.LayoutParams marginParams(int width, int height, int left, int top, int right,
+            int bottom) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(width, height);
         params.setMargins(left, top, right, bottom);
         return params;
     }
 
-    private static int dp(View view, float value) { return view.dp(value); }
+    private static int dp(View view, float value) {
+        return view.dp(value);
+    }
 }

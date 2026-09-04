@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class PatchouliCompat {
-    private PatchouliCompat() {}
+    private PatchouliCompat() {
+    }
+
     public static List<HandbookEntry> entries() {
         List<HandbookEntry> result = new ArrayList<>();
         for (Book book : BookRegistry.INSTANCE.books.values()) {
@@ -18,7 +20,8 @@ public final class PatchouliCompat {
             // Using a literal here makes ModernUI display the key itself when
             // the book is localized (and is why the registration name leaked
             // into the Hub label).
-            result.add(new HandbookEntry(Component.translatable(book.name), () -> ClientBookRegistry.INSTANCE.displayBookGui(book.id, null, 0)));
+            result.add(new HandbookEntry(Component.translatable(book.name),
+                    () -> ClientBookRegistry.INSTANCE.displayBookGui(book.id, null, 0)));
         }
         return result;
     }

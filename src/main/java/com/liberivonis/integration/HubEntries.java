@@ -32,39 +32,51 @@ import icyllis.modernui.mc.MuiModApi;
 
 public final class HubEntries {
     private static final Logger LOGGER = LoggerFactory.getLogger("LiberIvonis/HubEntries");
+
     public static List<HubEntry> collect() {
         List<HubEntry> result = new ArrayList<>();
         Map<String, HubEntry> builtins = builtins();
         for (String value : IvonisConfig.hubEntries.get()) {
             String[] spec = value.split("\\|", 2);
             String id = spec[0].trim();
-            if (id.startsWith("item:")) { addConfiguredItem(result, value.substring(5)); continue; }
-            if (id.startsWith("screen:")) { addConfiguredScreen(result, value.substring(7)); continue; }
+            if (id.startsWith("item:")) {
+                addConfiguredItem(result, value.substring(5));
+                continue;
+            }
+            if (id.startsWith("screen:")) {
+                addConfiguredScreen(result, value.substring(7));
+                continue;
+            }
             HubEntry entry = builtins.get(id);
             if (entry != null && entry.available()) {
                 String category = spec.length > 1 ? spec[1].trim() : "";
-                result.add(category.isEmpty() ? entry : new HubEntry(entry.id(), entry.title(), entry.subtitle(), entry.action(), entry.available(), category));
+                result.add(category.isEmpty() ? entry
+                        : new HubEntry(entry.id(), entry.title(), entry.subtitle(), entry.action(), entry.available(),
+                                category));
             }
         }
         // Category headings are rendered when the category changes while walking
-        // the list.  Configured entries can place entries from the same category
+        // the list. Configured entries can place entries from the same category
         // apart (for example a built-in followed by a configured screen), which
-        // would otherwise produce duplicate headings.  Stable grouping keeps the
+        // would otherwise produce duplicate headings. Stable grouping keeps the
         // first-seen category order while collecting all entries into one group.
         return groupByCategory(result);
     }
 
     private static List<HubEntry> applyConfiguredOrder(List<HubEntry> entries) {
         List<? extends String> configuredOrder = IvonisConfig.hubEntries.get();
-        if (configuredOrder.isEmpty()) return groupByCategory(entries);
+        if (configuredOrder.isEmpty())
+            return groupByCategory(entries);
 
         Map<String, HubEntry> byId = new LinkedHashMap<>();
-        for (HubEntry entry : entries) byId.putIfAbsent(entry.id(), entry);
+        for (HubEntry entry : entries)
+            byId.putIfAbsent(entry.id(), entry);
 
         List<HubEntry> ordered = new ArrayList<>();
         for (String value : configuredOrder) {
             HubEntry entry = byId.remove(value.trim());
-            if (entry != null) ordered.add(entry);
+            if (entry != null)
+                ordered.add(entry);
         }
         // Keep newly discovered integrations and configured entries visible even when
         // an existing config has not yet added them to entryOrder.
@@ -74,60 +86,97 @@ public final class HubEntries {
 
     private static List<HubEntry> groupByCategory(List<HubEntry> entries) {
         Map<String, List<HubEntry>> groups = new LinkedHashMap<>();
-        for (HubEntry entry : entries) groups.computeIfAbsent(entry.category(), ignored -> new ArrayList<>()).add(entry);
+        for (HubEntry entry : entries)
+            groups.computeIfAbsent(entry.category(), ignored -> new ArrayList<>()).add(entry);
         List<HubEntry> ordered = new ArrayList<>();
         List<HubEntry> ungrouped = groups.remove("");
-        if (ungrouped != null) ordered.addAll(ungrouped);
+        if (ungrouped != null)
+            ordered.addAll(ungrouped);
         groups.values().forEach(ordered::addAll);
         return ordered;
     }
 
     private static Map<String, HubEntry> builtins() {
         Map<String, HubEntry> entries = new LinkedHashMap<>();
-        entries.put("ftbquests", new HubEntry("ftbquests", Component.translatable("entry.liber_ivonis.ftbquests"), Component.translatable("entry.liber_ivonis.ftbquests.description"), () -> FtbQuestsCompat.open(), ModList.get().isLoaded("ftbquests")));
+        entries.put("ftbquests",
+                new HubEntry("ftbquests", Component.translatable("entry.liber_ivonis.ftbquests"),
+                        Component.translatable("entry.liber_ivonis.ftbquests.description"),
+                        () -> FtbQuestsCompat.open(), ModList.get().isLoaded("ftbquests")));
         boolean patchouliLoaded = ModList.get().isLoaded("patchouli");
-        entries.put("patchouli", new HubEntry("patchouli", Component.translatable("entry.liber_ivonis.patchouli"), Component.translatable("entry.liber_ivonis.patchouli.description"), openCategory("patchouli", "entry.liber_ivonis.patchouli", patchouliLoaded ? PatchouliCompat.entries() : List.of()), patchouliLoaded));
+        entries.put("patchouli", new HubEntry("patchouli", Component.translatable("entry.liber_ivonis.patchouli"),
+                Component.translatable("entry.liber_ivonis.patchouli.description"), openCategory("patchouli",
+                        "entry.liber_ivonis.patchouli", patchouliLoaded ? PatchouliCompat.entries() : List.of()),
+                patchouliLoaded));
         boolean modonomiconLoaded = ModList.get().isLoaded("modonomicon");
-        entries.put("modonomicon", new HubEntry("modonomicon", Component.translatable("entry.liber_ivonis.modonomicon"), Component.translatable("entry.liber_ivonis.modonomicon.description"),
-                openCategory("modonomicon", "entry.liber_ivonis.modonomicon", modonomiconLoaded ? ModonomiconCompat.entries() : List.of()), modonomiconLoaded));
+        entries.put("modonomicon",
+                new HubEntry("modonomicon", Component.translatable("entry.liber_ivonis.modonomicon"),
+                        Component.translatable("entry.liber_ivonis.modonomicon.description"),
+                        openCategory("modonomicon", "entry.liber_ivonis.modonomicon",
+                                modonomiconLoaded ? ModonomiconCompat.entries() : List.of()),
+                        modonomiconLoaded));
         boolean guideMeLoaded = ModList.get().isLoaded("guideme");
-        entries.put("guideme", new HubEntry("guideme", Component.translatable("entry.liber_ivonis.guideme"), Component.translatable("entry.liber_ivonis.guideme.description"), openCategory("guideme", "entry.liber_ivonis.guideme", guideMeLoaded ? GuideMeCompat.entries() : List.of()), guideMeLoaded));
+        entries.put("guideme",
+                new HubEntry("guideme", Component.translatable("entry.liber_ivonis.guideme"),
+                        Component.translatable("entry.liber_ivonis.guideme.description"), openCategory("guideme",
+                                "entry.liber_ivonis.guideme", guideMeLoaded ? GuideMeCompat.entries() : List.of()),
+                        guideMeLoaded));
         boolean ageratumLoaded = ModList.get().isLoaded("ageratum");
-        entries.put("ageratum", new HubEntry("ageratum", Component.translatable("entry.liber_ivonis.ageratum"), Component.translatable("entry.liber_ivonis.ageratum.description"), openCategory("ageratum", "entry.liber_ivonis.ageratum", ageratumLoaded ? List.of(new HandbookEntry(Component.translatable("entry.liber_ivonis.ageratum"), AgeratumCompat::open)) : List.of()), ageratumLoaded));
-        entries.put("inventory", new HubEntry("inventory", Component.translatable("entry.liber_ivonis.inventory"), Component.translatable("entry.liber_ivonis.inventory.description"), openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), true));
-        entries.put("advancement", new HubEntry("advancement", Component.translatable("entry.liber_ivonis.advancement"), Component.translatable("entry.liber_ivonis.advancement.description"), openNative(() -> new AdvancementsScreen(Minecraft.getInstance().player.connection.getAdvancements())), true));
-        entries.put("controls", new HubEntry("controls", Component.translatable("entry.liber_ivonis.controls"), Component.translatable("entry.liber_ivonis.controls.description"), openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), true));
+        entries.put("ageratum", new HubEntry("ageratum", Component.translatable("entry.liber_ivonis.ageratum"),
+                Component.translatable("entry.liber_ivonis.ageratum.description"),
+                openCategory("ageratum", "entry.liber_ivonis.ageratum", ageratumLoaded ? List.of(
+                        new HandbookEntry(Component.translatable("entry.liber_ivonis.ageratum"), AgeratumCompat::open))
+                        : List.of()),
+                ageratumLoaded));
+        entries.put("inventory",
+                new HubEntry("inventory", Component.translatable("entry.liber_ivonis.inventory"),
+                        Component.translatable("entry.liber_ivonis.inventory.description"),
+                        openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), true));
+        entries.put("advancement", new HubEntry("advancement", Component.translatable("entry.liber_ivonis.advancement"),
+                Component.translatable("entry.liber_ivonis.advancement.description"),
+                openNative(() -> new AdvancementsScreen(Minecraft.getInstance().player.connection.getAdvancements())),
+                true));
+        entries.put("controls",
+                new HubEntry("controls", Component.translatable("entry.liber_ivonis.controls"),
+                        Component.translatable("entry.liber_ivonis.controls.description"),
+                        openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), true));
         return entries;
     }
 
-
     private static void addConfiguredScreen(List<HubEntry> out, String value) {
-            String[] p = value.split("\\|", 4);
-            if (p.length < 2) return;
-            String method = p.length >= 3 && !p[2].isBlank() ? p[2] : "create";
-            String category = p.length >= 4 && !p[3].isBlank() ? p[3] : "";
-            if (p.length >= 2) out.add(new HubEntry(
+        String[] p = value.split("\\|", 4);
+        if (p.length < 2)
+            return;
+        String method = p.length >= 3 && !p[2].isBlank() ? p[2] : "create";
+        String category = p.length >= 4 && !p[3].isBlank() ? p[3] : "";
+        if (p.length >= 2)
+            out.add(new HubEntry(
                     "custom:" + p[1],
                     configurableTitle(p[0]),
                     Component.translatable("entry.liber_ivonis.configured_screen.description"),
                     () -> openScreen(invokeScreen(p[1], method)).run(),
-                    true, category
-            ));
+                    true, category));
     }
 
     private static void addConfiguredItem(List<HubEntry> out, String value) {
         String[] p = value.split("\\|", 3);
-        if (p.length == 0) return;
+        if (p.length == 0)
+            return;
         Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
-        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) return;
+        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
+            return;
         Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
         String category = p.length > 2 ? p[2].trim() : "";
-        out.add(new HubEntry("item:" + p[0], title, Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item), true, category));
+        out.add(new HubEntry("item:" + p[0], title,
+                Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item),
+                true, category));
     }
 
-    private static void optional(List<HubEntry> out, String mod, String titleKey, String subtitleKey, Supplier<Runnable> opener) {
+    private static void optional(List<HubEntry> out, String mod, String titleKey, String subtitleKey,
+            Supplier<Runnable> opener) {
         boolean available = ModList.get().isLoaded(mod);
-        if (available) out.add(new HubEntry(mod, Component.translatable(titleKey), Component.translatable(subtitleKey), opener.get(), true));
+        if (available)
+            out.add(new HubEntry(mod, Component.translatable(titleKey), Component.translatable(subtitleKey),
+                    opener.get(), true));
     }
 
     private static Screen useHandbook(String id) {
@@ -136,7 +185,8 @@ public final class HubEntries {
     }
 
     private static Screen useHandbook(Item item) {
-        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) return null;
+        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
+            return null;
         Minecraft client = Minecraft.getInstance();
         if (client.level != null && client.player != null) {
             client.execute(() -> item.use(client.level, client.player, net.minecraft.world.InteractionHand.MAIN_HAND));
@@ -167,22 +217,28 @@ public final class HubEntries {
     private static Runnable openNative(java.util.function.Supplier<Screen> supplier) {
         return () -> {
             Screen screen = supplier.get();
-            if (screen != null) HubEntriesHolder.open(screen);
+            if (screen != null)
+                HubEntriesHolder.open(screen);
         };
     }
 
     private static final class HubEntriesHolder {
-        private static void open(Screen screen) { Minecraft.getInstance().setScreen(screen); }
+        private static void open(Screen screen) {
+            Minecraft.getInstance().setScreen(screen);
+        }
     }
 
     private static List<HandbookEntry> configured(String namespace) {
         List<HandbookEntry> result = new ArrayList<>();
         for (String value : IvonisConfig.hubEntries.get()) {
-            if (!value.startsWith("item:")) continue;
+            if (!value.startsWith("item:"))
+                continue;
             String[] p = value.substring(5).split("\\|", 2);
-            if (!p[0].startsWith(namespace + ":")) continue;
+            if (!p[0].startsWith(namespace + ":"))
+                continue;
             Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
-            if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) continue;
+            if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
+                continue;
             Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
             result.add(new HandbookEntry(title, () -> useHandbook(item)));
         }
@@ -196,38 +252,50 @@ public final class HubEntries {
     private static Screen invokeScreen(String className, String preferredMethod) {
         try {
             Class<?> type = Class.forName(className);
-            // LOGGER.info("Resolving custom screen {} using {}", className, preferredMethod);
+            // LOGGER.info("Resolving custom screen {} using {}", className,
+            // preferredMethod);
             Minecraft client = Minecraft.getInstance();
-            Object[] commonArgs = {client, client.level, client.player, null};
+            Object[] commonArgs = { client, client.level, client.player, null };
             boolean constructorOnly = "<init>".equals(preferredMethod);
-            for (String methodName : constructorOnly ? List.<String>of() : List.of(preferredMethod, "open", "create", "getScreen")) {
+            for (String methodName : constructorOnly ? List.<String>of()
+                    : List.of(preferredMethod, "open", "create", "getScreen")) {
                 for (Method method : type.getDeclaredMethods()) {
-                    if (!method.getName().equals(methodName) || !java.lang.reflect.Modifier.isStatic(method.getModifiers())) continue;
+                    if (!method.getName().equals(methodName)
+                            || !java.lang.reflect.Modifier.isStatic(method.getModifiers()))
+                        continue;
                     Object[] args = resolveArguments(method.getParameterTypes(), commonArgs);
-                    if (args == null) continue;
-                    // LOGGER.info("Invoking {}.{} with {} parameter(s)", className, methodName, args.length);
+                    if (args == null)
+                        continue;
+                    // LOGGER.info("Invoking {}.{} with {} parameter(s)", className, methodName,
+                    // args.length);
                     method.setAccessible(true);
                     Object result = method.invoke(null, args);
-                    if (result instanceof Screen screen) return screen;
+                    if (result instanceof Screen screen)
+                        return screen;
                 }
             }
             // Also support constructors such as new KeymapScreen(null).
             java.lang.reflect.Constructor<?>[] constructors = type.getDeclaredConstructors();
-            // LOGGER.info("Inspecting {} constructor(s) for {}", constructors.length, className);
+            // LOGGER.info("Inspecting {} constructor(s) for {}", constructors.length,
+            // className);
             for (java.lang.reflect.Constructor<?> constructor : constructors) {
                 Object[] args = resolveArguments(constructor.getParameterTypes(), commonArgs);
                 if (args == null) {
                     LOGGER.warn("Skipping unsupported constructor {}", constructor);
                     continue;
                 }
-                // LOGGER.info("Invoking {} constructor with {} parameter(s)", className, args.length);
+                // LOGGER.info("Invoking {} constructor with {} parameter(s)", className,
+                // args.length);
                 constructor.setAccessible(true);
                 Object result = constructor.newInstance(args);
-                // LOGGER.info("Constructed custom screen object: {}", result == null ? "null" : result.getClass().getName());
-                if (result instanceof Screen screen) return screen;
+                // LOGGER.info("Constructed custom screen object: {}", result == null ? "null" :
+                // result.getClass().getName());
+                if (result instanceof Screen screen)
+                    return screen;
             }
-            // LOGGER.info("No compatible constructor found for {}. Available constructors: {}",
-            //         className, java.util.Arrays.toString(type.getDeclaredConstructors()));
+            // LOGGER.info("No compatible constructor found for {}. Available constructors:
+            // {}",
+            // className, java.util.Arrays.toString(type.getDeclaredConstructors()));
         } catch (ReflectiveOperationException | RuntimeException | LinkageError e) {
             LOGGER.error("Failed to create custom screen {} using {}", className, preferredMethod, e);
         }
@@ -241,11 +309,17 @@ public final class HubEntries {
             boolean found = false;
             for (int j = 0; j < commonArgs.length; j++) {
                 Object value = commonArgs[j];
-                if (used[j] || (value != null && !parameterTypes[i].isInstance(value))) continue;
-                if (value == null && parameterTypes[i].isPrimitive()) continue;
-                result[i] = value; used[j] = true; found = true; break;
+                if (used[j] || (value != null && !parameterTypes[i].isInstance(value)))
+                    continue;
+                if (value == null && parameterTypes[i].isPrimitive())
+                    continue;
+                result[i] = value;
+                used[j] = true;
+                found = true;
+                break;
             }
-            if (!found) return null;
+            if (!found)
+                return null;
         }
         return result;
     }

@@ -7,7 +7,8 @@ import net.minecraft.client.gui.screens.Screen;
 public final class HubNavigation {
     private static boolean switchingToChild;
 
-    private HubNavigation() {}
+    private HubNavigation() {
+    }
 
     public static void openChild(Screen child) {
         Minecraft client = Minecraft.getInstance();

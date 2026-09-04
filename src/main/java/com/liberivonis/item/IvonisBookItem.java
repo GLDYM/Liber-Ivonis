@@ -13,7 +13,9 @@ import net.minecraft.network.chat.Component;
 import java.util.List;
 
 public final class IvonisBookItem extends Item {
-    public IvonisBookItem(Properties properties) { super(properties); }
+    public IvonisBookItem(Properties properties) {
+        super(properties);
+    }
 
     @Override
     public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
@@ -24,7 +26,8 @@ public final class IvonisBookItem extends Item {
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents,
+            TooltipFlag tooltipFlag) {
         tooltipComponents.add(Component.translatable("tooltip.liber_ivonis.soulbound").withStyle(ChatFormatting.AQUA));
         super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
     }
