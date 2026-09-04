@@ -1,5 +1,9 @@
 {
+  "key.liber_ivonis.open_hub": "Open Liber Ivonis",
+  "key.categories.liber_ivonis": "Liber Ivonis",
   "item.liber_ivonis.ivonis_book": "Liber Ivonis",
+  "tooltip.liber_ivonis.soulbound": "Soulbound",
+  "sidebar_button.ftblibrary.ivonis_book": "Open Liber Ivonis",
   "screen.liber_ivonis.hub": "Liber Ivonis",
   "screen.liber_ivonis.subtitle": "Knowledge at your fingertips",
   "screen.liber_ivonis.back": "Back",

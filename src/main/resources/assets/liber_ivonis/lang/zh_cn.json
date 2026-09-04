@@ -1,5 +1,9 @@
 {
+  "key.liber_ivonis.open_hub": "打开伊波恩之书",
+  "key.categories.liber_ivonis": "伊波恩之书",
   "item.liber_ivonis.ivonis_book": "伊波恩之书",
+  "tooltip.liber_ivonis.soulbound": "灵魂绑定",
+  "sidebar_button.ftblibrary.ivonis_book": "打开伊波恩之书",
   "screen.liber_ivonis.hub": "伊波恩之书",
   "screen.liber_ivonis.subtitle": "整合包知识中枢",
   "screen.liber_ivonis.back": "返回",

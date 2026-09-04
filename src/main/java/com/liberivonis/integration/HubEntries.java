@@ -35,29 +35,27 @@ public final class HubEntries {
     public static List<HubEntry> collect() {
         List<HubEntry> result = new ArrayList<>();
         Map<String, HubEntry> builtins = builtins();
-        for (String value : IvonisConfig.builtinEntries.get()) {
+        for (String value : IvonisConfig.hubEntries.get()) {
             String[] spec = value.split("\\|", 2);
-            HubEntry entry = builtins.get(spec[0].trim());
+            String id = spec[0].trim();
+            if (id.startsWith("item:")) { addConfiguredItem(result, value.substring(5)); continue; }
+            if (id.startsWith("screen:")) { addConfiguredScreen(result, value.substring(7)); continue; }
+            HubEntry entry = builtins.get(id);
             if (entry != null && entry.available()) {
                 String category = spec.length > 1 ? spec[1].trim() : "";
                 result.add(category.isEmpty() ? entry : new HubEntry(entry.id(), entry.title(), entry.subtitle(), entry.action(), entry.available(), category));
             }
         }
-        addConfiguredScreens(result);
-        for (String value : IvonisConfig.handbookItems.get()) {
-            String[] p = value.split("\\|", 3);
-            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
-            if (item != BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) {
-                Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
-                String category = p.length > 2 && !p[2].isBlank() ? p[2].trim() : "";
-                result.add(new HubEntry("item:" + p[0], title, Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item), true, category));
-            }
-        }
-        return applyConfiguredOrder(result);
+        // Category headings are rendered when the category changes while walking
+        // the list.  Configured entries can place entries from the same category
+        // apart (for example a built-in followed by a configured screen), which
+        // would otherwise produce duplicate headings.  Stable grouping keeps the
+        // first-seen category order while collecting all entries into one group.
+        return groupByCategory(result);
     }
 
     private static List<HubEntry> applyConfiguredOrder(List<HubEntry> entries) {
-        List<? extends String> configuredOrder = IvonisConfig.entryOrder.get();
+        List<? extends String> configuredOrder = IvonisConfig.hubEntries.get();
         if (configuredOrder.isEmpty()) return groupByCategory(entries);
 
         Map<String, HubEntry> byId = new LinkedHashMap<>();
@@ -103,20 +101,28 @@ public final class HubEntries {
     }
 
 
-    private static void addConfiguredScreens(List<HubEntry> out) {
-        for (String value : IvonisConfig.customScreens.get()) {
+    private static void addConfiguredScreen(List<HubEntry> out, String value) {
             String[] p = value.split("\\|", 4);
-            if (p.length < 2) continue;
+            if (p.length < 2) return;
             String method = p.length >= 3 && !p[2].isBlank() ? p[2] : "create";
             String category = p.length >= 4 && !p[3].isBlank() ? p[3] : "";
-            out.add(new HubEntry(
+            if (p.length >= 2) out.add(new HubEntry(
                     "custom:" + p[1],
                     configurableTitle(p[0]),
                     Component.translatable("entry.liber_ivonis.configured_screen.description"),
                     () -> openScreen(invokeScreen(p[1], method)).run(),
                     true, category
             ));
-        }
+    }
+
+    private static void addConfiguredItem(List<HubEntry> out, String value) {
+        String[] p = value.split("\\|", 3);
+        if (p.length == 0) return;
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
+        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) return;
+        Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
+        String category = p.length > 2 ? p[2].trim() : "";
+        out.add(new HubEntry("item:" + p[0], title, Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item), true, category));
     }
 
     private static void optional(List<HubEntry> out, String mod, String titleKey, String subtitleKey, Supplier<Runnable> opener) {
@@ -171,8 +177,9 @@ public final class HubEntries {
 
     private static List<HandbookEntry> configured(String namespace) {
         List<HandbookEntry> result = new ArrayList<>();
-        for (String value : IvonisConfig.handbookItems.get()) {
-            String[] p = value.split("\\|", 2);
+        for (String value : IvonisConfig.hubEntries.get()) {
+            if (!value.startsWith("item:")) continue;
+            String[] p = value.substring(5).split("\\|", 2);
             if (!p[0].startsWith(namespace + ":")) continue;
             Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
             if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) continue;

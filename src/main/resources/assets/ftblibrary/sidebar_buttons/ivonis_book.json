@@ -1,0 +1,8 @@
+{
+  "icon": ["liber_ivonis:item/ivonis_book"],
+  "default_enabled": true,
+  "click": ["custom:liber_ivonis:open_hub"],
+  "loading_screen": false,
+  "tooltip": [{"translate":"item.liber_ivonis.ivonis_book"}],
+  "sort_index": 0
+}
