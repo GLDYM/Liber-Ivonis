@@ -15,15 +15,17 @@ NeoForge 1.21.1 的多模组界面入口。右键使用伊波恩之书打开暗�
 
 ```toml
 [hub]
-showUnavailable = false
-builtinEntries = ["ftbquests", "patchouli|key:examplemod.category.adventure", "inventory"]
-entryOrder = ["patchouli", "item:examplemod:guide_book", "custom:com.example.client.ExampleScreen", "inventory"]
+entries = ["ftbquests", "patchouli", "item:examplemod:guide_book|示例手册|key:examplemod.category.adventure"]
 
-[handbooks]
-handbookItems = ["examplemod:guide_book|示例手册|key:examplemod.category.adventure"]
-
-[customScreens]
-customScreens = ["我的界面|com.example.client.ExampleScreen|create|key:examplemod.category.tools"]
+[hub.colors]
+# Hexadecimal colours in #AARRGGBB or #RRGGBB format. #RRGGBB is fully opaque.
+background = "#FF0D1117"
+surface = "#FF171D27"
+surfaceAlt = "#FF202938"
+accent = "#FFE8D9B5"
+muted = "#FF9AA6B8"
+outline = "#FF364255"
+disabledOutline = "#FF252C38"
 ```
 
 自定义界面名称支持翻译键：将第一个字段写成 `key:examplemod.screen.title`；不带 `key:` 时按普通文字显示。

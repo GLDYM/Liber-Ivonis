@@ -23,11 +23,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.liberivonis.client.screen.HandbookEntry;
-import com.liberivonis.client.screen.HandbookCategoryFragment;
 import icyllis.modernui.mc.MuiModApi;
 
 public final class HubEntries {
@@ -55,33 +53,7 @@ public final class HubEntries {
                                 category));
             }
         }
-        // Category headings are rendered when the category changes while walking
-        // the list. Configured entries can place entries from the same category
-        // apart (for example a built-in followed by a configured screen), which
-        // would otherwise produce duplicate headings. Stable grouping keeps the
-        // first-seen category order while collecting all entries into one group.
         return groupByCategory(result);
-    }
-
-    private static List<HubEntry> applyConfiguredOrder(List<HubEntry> entries) {
-        List<? extends String> configuredOrder = IvonisConfig.hubEntries.get();
-        if (configuredOrder.isEmpty())
-            return groupByCategory(entries);
-
-        Map<String, HubEntry> byId = new LinkedHashMap<>();
-        for (HubEntry entry : entries)
-            byId.putIfAbsent(entry.id(), entry);
-
-        List<HubEntry> ordered = new ArrayList<>();
-        for (String value : configuredOrder) {
-            HubEntry entry = byId.remove(value.trim());
-            if (entry != null)
-                ordered.add(entry);
-        }
-        // Keep newly discovered integrations and configured entries visible even when
-        // an existing config has not yet added them to entryOrder.
-        ordered.addAll(byId.values());
-        return ordered;
     }
 
     private static List<HubEntry> groupByCategory(List<HubEntry> entries) {
@@ -171,18 +143,6 @@ public final class HubEntries {
                 true, category));
     }
 
-    private static void optional(List<HubEntry> out, String mod, String titleKey, String subtitleKey,
-            Supplier<Runnable> opener) {
-        boolean available = ModList.get().isLoaded(mod);
-        if (available)
-            out.add(new HubEntry(mod, Component.translatable(titleKey), Component.translatable(subtitleKey),
-                    opener.get(), true));
-    }
-
-    private static Screen useHandbook(String id) {
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(id));
-        return useHandbook(item);
-    }
 
     private static Screen useHandbook(Item item) {
         if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
@@ -226,23 +186,6 @@ public final class HubEntries {
         private static void open(Screen screen) {
             Minecraft.getInstance().setScreen(screen);
         }
-    }
-
-    private static List<HandbookEntry> configured(String namespace) {
-        List<HandbookEntry> result = new ArrayList<>();
-        for (String value : IvonisConfig.hubEntries.get()) {
-            if (!value.startsWith("item:"))
-                continue;
-            String[] p = value.substring(5).split("\\|", 2);
-            if (!p[0].startsWith(namespace + ":"))
-                continue;
-            Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
-            if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
-                continue;
-            Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
-            result.add(new HandbookEntry(title, () -> useHandbook(item)));
-        }
-        return result;
     }
 
     /**
