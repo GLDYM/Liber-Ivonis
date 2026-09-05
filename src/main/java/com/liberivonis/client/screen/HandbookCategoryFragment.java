@@ -74,7 +74,10 @@ public final class HandbookCategoryFragment extends Fragment {
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
         Button close = new Button(context);
         close.setText(Component.translatable("screen.liber_ivonis.back").getString());
+        close.setTextSize(14);
         close.setTextColor(colors.accent());
+        close.setPadding(close.dp(16), close.dp(6), close.dp(16), close.dp(6));
+        close.setMinHeight(close.dp(36));
         close.setBackground(card(colors));
         close.setOnClickListener(v -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
         root.addView(close,

@@ -115,8 +115,8 @@ public final class IvonisHubFragment extends Fragment {
         close.setTextSize(14);
         close.setTextColor(colors.accent());
         close.setBackground(cardBackground(true, colors));
-        // Keep the action comfortably wide even when the translated label is short.
-        // The MATCH_PARENT layout below makes it span the complete content width.
+        close.setPadding(close.dp(16), close.dp(6), close.dp(16), close.dp(6));
+        close.setMinHeight(close.dp(36));
         close.setMinWidth(dp(close, 240));
         close.setOnClickListener(
                 view -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
