@@ -1,10 +1,13 @@
 package com.liberivonis.event;
 
 import com.liberivonis.LiberIvonis;
+import com.liberivonis.config.IvonisConfig;
 import com.liberivonis.registry.ModItems;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.advancements.AdvancementHolder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
@@ -19,6 +22,18 @@ import java.util.List;
 @EventBusSubscriber(modid = LiberIvonis.MOD_ID)
 public final class IvonisSoulboundEvent {
     private static final String KEY = "LiberIvonisSoulboundBooks";
+    private static final ResourceLocation START_ADVANCEMENT = ResourceLocation.fromNamespaceAndPath(
+            LiberIvonis.MOD_ID, "receive_ivonis_book");
+
+    @SubscribeEvent
+    public static void loggedIn(PlayerEvent.PlayerLoggedInEvent event) {
+        if (!IvonisConfig.giveBookOnStart.get() || !(event.getEntity() instanceof ServerPlayer player)
+                || player.getServer() == null)
+            return;
+        AdvancementHolder advancement = player.getServer().getAdvancements().get(START_ADVANCEMENT);
+        if (advancement != null)
+            player.getAdvancements().award(advancement, "login");
+    }
 
     @SubscribeEvent(priority = EventPriority.HIGHEST)
     public static void drops(LivingDropsEvent event) {

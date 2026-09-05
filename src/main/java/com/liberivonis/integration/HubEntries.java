@@ -118,14 +118,16 @@ public final class HubEntries {
         String[] p = value.split("\\|", 4);
         if (p.length < 2)
             return;
-        String method = p.length >= 3 && !p[2].isBlank() ? p[2] : "create";
-        String category = p.length >= 4 && !p[3].isBlank() ? p[3] : "";
-        if (p.length >= 2)
+        String className = p[0].trim();
+        String method = !p[1].isBlank() ? p[1].trim() : "create";
+        String title = p.length >= 3 ? p[2].trim() : "";
+        String category = p.length >= 4 && !p[3].isBlank() ? p[3].trim() : "";
+        if (!className.isBlank())
             out.add(new HubEntry(
-                    "custom:" + p[1],
-                    configurableTitle(p[0]),
+                    "custom:" + className,
+                    title.isBlank() ? Component.literal(className) : configurableTitle(title),
                     Component.translatable("entry.liber_ivonis.configured_screen.description"),
-                    () -> openScreen(invokeScreen(p[1], method)).run(),
+                    () -> openScreen(invokeScreen(className, method)).run(),
                     true, category));
     }
 

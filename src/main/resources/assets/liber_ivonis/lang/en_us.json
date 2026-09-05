@@ -27,6 +27,18 @@
   "entry.liber_ivonis.advancement.description": "View your advancements",
   "entry.liber_ivonis.controls": "Key Bindings",
   "entry.liber_ivonis.controls.description": "Configure controls",
+  "screen.liber_ivonis.settings": "Liber Ivonis Settings",
+  "screen.liber_ivonis.settings.give_book": "Give Liber Ivonis on first login",
+  "screen.liber_ivonis.settings.server_only": "This option is a common setting and is used by the server",
+  "screen.liber_ivonis.settings.save": "Save",
+  "screen.liber_ivonis.settings.invalid_color": "Invalid colour value",
+  "hub.color.background": "Background",
+  "hub.color.surface": "Surface",
+  "hub.color.surfaceAlt": "Alternate surface",
+  "hub.color.accent": "Accent",
+  "hub.color.muted": "Muted text",
+  "hub.color.outline": "Outline",
+  "hub.color.disabledOutline": "Disabled outline",
   "entry.liber_ivonis.configured_handbook.description": "Configured handbook",
   "entry.liber_ivonis.configured_screen.description": "Configured screen"
 }

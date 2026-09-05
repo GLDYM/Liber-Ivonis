@@ -6,6 +6,9 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.ModContainer;
+import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import com.liberivonis.client.screen.IvonisConfigFragment;
+import icyllis.modernui.mc.MuiModApi;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraft.world.item.CreativeModeTabs;
 
@@ -15,7 +18,10 @@ public final class LiberIvonis {
 
     public LiberIvonis(IEventBus modEventBus, ModContainer container) {
         ModItems.ITEMS.register(modEventBus);
-        container.registerConfig(ModConfig.Type.CLIENT, IvonisConfig.SPEC);
+        container.registerConfig(ModConfig.Type.CLIENT, IvonisConfig.CLIENT_SPEC);
+        container.registerConfig(ModConfig.Type.COMMON, IvonisConfig.COMMON_SPEC);
+        container.registerExtensionPoint(IConfigScreenFactory.class,
+                (modContainer, parent) -> MuiModApi.get().createScreen(new IvonisConfigFragment(parent), null, parent));
         modEventBus.addListener(this::addCreativeTabContents);
     }
 

@@ -1,0 +1,11 @@
+{
+  "criteria": {
+    "login": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [["login"]],
+  "rewards": {
+    "loot": ["liber_ivonis:give_ivonis_book"]
+  }
+}

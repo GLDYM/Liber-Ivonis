@@ -1,21 +1,54 @@
+<div align="center">
+
 # Liber Ivonis 伊波恩之书
 
-NeoForge 1.21.1 的多模组界面入口。右键使用伊波恩之书打开暗色 Screen Hub。
+*Minecraft Modpack Screen Hub*
 
-## 设计与兼容
+</div>
 
-- ModernUI NeoForge `3.13.0.1`（Curse Maven `8206075`）是必需依赖，项目使用其 Arc3D 渲染运行时。
-- Hub 核心不直接链接可选模组类；FTB Quests、Patchouli、Modonomicon、GuideME 与藿香在模组存在时显示。
-- 手册入口优先调用手册物品自身的客户端 `use` 行为，避免绑定私有 Screen 类。
-- 容器类 GUI 仍必须由目标模组创建并同步菜单，Hub 不绕过服务端校验。
+![Hub](./img/hub.png)
 
-## 配置
+## Introduction
 
-配置文件：`config/liber_ivonis-client.toml`
+In a modpack with massive mods, we need to bind many keys only to open a certain screen; Liber Ivonis is a mod that provides a screen hub to collect those screens.
+
+[ModernUI](https://www.curseforge.com/minecraft/mc-mods/modern-ui) is required to run this mod.
+
+## Feature
+
+- A Screen Hub to collect screens 
+- Open by Liber Ivonis item, Key or FTBLibrary buttom
+- Integration of FTBQusets, Patchouli, Modonomicon, GuideME & Ageratum
+- Support custom items & screens by a simple configuration
+- Configurable color
+
+## Configuration
+
+Client：`config/liber_ivonis-client.toml`
 
 ```toml
 [hub]
-entries = ["ftbquests", "patchouli", "item:examplemod:guide_book|示例手册|key:examplemod.category.adventure"]
+# Hub entries in display order
+# Built-in: id|category
+# Handbook: item:modid:item_id|title|category
+# Screen: screen:class|method|title|category
+# title & category support translation key, use `key:title.ageratum.guidebook`
+# The params of method should be (Screen, Minecraft, ServerPlayer, Level) or no param
+# The Return Type should be a sub-class of Screen
+entries = [
+    "controls|key:category.base", 
+    "ftbquests|Task", # Also "screen:dev.ftb.mods.ftbquests.client.FTBQuestsClient|openGui|FTBQuests|Task"
+    "patchouli|Handbook", 
+    "modonomicon|Handbook", 
+    "guideme|Handbook", 
+    "ageratum|Handbook", 
+    "advancement|Task", 
+    "item:ageratum:guidebook|key:title.ageratum.guidebook|Handbook",
+    "screen:com.github.einjerjar.mc.keymap.client.gui.screen.KeymapScreen|<init>|KeyMapping (Visual)|key:category.base", 
+    "screen:xin.vanilla.narcissus.integration.ScreenHelper|openScreen|Waypoints|Narcissus", 
+    "screen:xin.vanilla.narcissus.integration.ScreenHelper|openAccessListScreen|Access List|Narcissus"
+]
+
 
 [hub.colors]
 # Hexadecimal colours in #AARRGGBB or #RRGGBB format. #RRGGBB is fully opaque.
@@ -28,6 +61,9 @@ outline = "#FF364255"
 disabledOutline = "#FF252C38"
 ```
 
-自定义界面名称支持翻译键：将第一个字段写成 `key:examplemod.screen.title`；不带 `key:` 时按普通文字显示。
+Common：`config/liber_ivonis-common.toml`
 
-自定义屏幕方法必须是静态方法，返回 `net.minecraft.client.gui.screens.Screen`。默认尝试的方法名为 `create`，也支持 `open` 与 `getScreen`。
+```toml
+[gameplay]
+giveBookOnStart = true
+```

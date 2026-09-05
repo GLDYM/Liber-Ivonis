@@ -27,6 +27,18 @@
   "entry.liber_ivonis.advancement.description": "查看游戏成就",
   "entry.liber_ivonis.controls": "按键绑定",
   "entry.liber_ivonis.controls.description": "配置游戏按键",
+  "screen.liber_ivonis.settings": "伊波恩之书设置",
+  "screen.liber_ivonis.settings.give_book": "首次进入游戏时给予伊波恩之书",
+  "screen.liber_ivonis.settings.server_only": "此选项为通用配置，由服务器读取",
+  "screen.liber_ivonis.settings.save": "保存",
+  "screen.liber_ivonis.settings.invalid_color": "颜色值无效",
+  "hub.color.background": "背景",
+  "hub.color.surface": "面板",
+  "hub.color.surfaceAlt": "强调面板",
+  "hub.color.accent": "强调文字",
+  "hub.color.muted": "弱化文字",
+  "hub.color.outline": "边框",
+  "hub.color.disabledOutline": "禁用边框",
   "entry.liber_ivonis.configured_handbook.description": "配置的教程手册",
   "entry.liber_ivonis.configured_screen.description": "配置的界面"
 }

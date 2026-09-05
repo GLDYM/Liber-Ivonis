@@ -29,7 +29,7 @@ side = "BOTH"
 [[dependencies."${mod_id}"]]
 modId = "modernui"
 type = "required"
-versionRange = "[0,)"
+versionRange = "[3,)"
 ordering = "AFTER"
 side = "CLIENT"
 
