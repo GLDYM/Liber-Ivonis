@@ -45,6 +45,8 @@ dependencies {
     implementation 'vazkii.patchouli:Patchouli:1.21.1-93-NEOFORGE'
     implementation 'curse.maven:modonomicon-538392:8532346'
     implementation 'org.appliedenergistics:guideme:21.1.15'
+    // Optional compatibility target: replaces the vanilla advancements screen.
+    compileOnly 'curse.maven:advancements-reloaded-1113876:5835520'
 }
 
 tasks.named('processResources', ProcessResources).configure {

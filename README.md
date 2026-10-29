@@ -10,21 +10,21 @@
 
 ## Introduction
 
-In a modpack with massive mods, we need to bind many keys only to open a certain screen; Liber Ivonis is a mod that provides a screen hub to collect those screens.
+In a modpack with many mods, we need to bind many keys only to open a certain screen; Liber Ivonis is a mod that provides a screen hub to collect those screens.
 
 [ModernUI](https://www.curseforge.com/minecraft/mc-mods/modern-ui) is required to run this mod.
 
 ## Feature
 
 - A Screen Hub to collect screens 
-- Open by Liber Ivonis item, Key or FTBLibrary buttom
-- Integration of FTBQusets, Patchouli, Modonomicon, GuideME & Ageratum
-- Support custom items & screens by a simple configuration
+- Open with the Liber Ivonis item, key, or FTB Library button
+- Integration of FTBQuests, Patchouli, Modonomicon, GuideME & Ageratum
+- Support custom items & screens with a simple configuration
 - Configurable color
 
 ## Configuration
 
-Client：`config/liber_ivonis-client.toml`
+Client: `config/liber_ivonis-client.toml`
 
 ```toml
 [hub]
@@ -37,7 +37,7 @@ Client：`config/liber_ivonis-client.toml`
 # The Return Type should be a sub-class of Screen
 entries = [
     "controls|key:category.base", 
-    "ftbquests|Task", # Also "screen:dev.ftb.mods.ftbquests.client.FTBQuestsClient|openGui|FTBQuests|Task"
+    "ftbquests|Task", # Also "screen:dev.ftb.mods.ftbquests.client.FTBQuestsClient|openGui|key:entry.liber_ivonis.ftbquests|Task"
     "patchouli|Handbook", 
     "modonomicon|Handbook", 
     "guideme|Handbook", 
@@ -52,16 +52,16 @@ entries = [
 
 [hub.colors]
 # Hexadecimal colours in #AARRGGBB or #RRGGBB format. #RRGGBB is fully opaque.
-background = "#FF0D1117"
-surface = "#FF171D27"
-surfaceAlt = "#FF202938"
-accent = "#FFE8D9B5"
-muted = "#FF9AA6B8"
-outline = "#FF364255"
-disabledOutline = "#FF252C38"
+background = "#FF0D0F15"
+surface = "#FF171A23"
+surfaceAlt = "#FF2E3547"
+accent = "#FFF2F5F9"
+muted = "#FFAEB8C6"
+outline = "#FF7FD9F5"
+disabledOutline = "#FF2B3244"
 ```
 
-Common：`config/liber_ivonis-common.toml`
+Common: `config/liber_ivonis-common.toml`
 
 ```toml
 [gameplay]

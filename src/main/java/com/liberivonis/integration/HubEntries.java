@@ -6,6 +6,7 @@ import com.liberivonis.compat.PatchouliCompat;
 import com.liberivonis.compat.GuideMeCompat;
 import com.liberivonis.compat.AgeratumCompat;
 import com.liberivonis.compat.ModonomiconCompat;
+import com.liberivonis.compat.AdvancementsReloadedCompat;
 import com.liberivonis.client.screen.HandbookCategoryFragment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -105,13 +106,24 @@ public final class HubEntries {
                         openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), true));
         entries.put("advancement", new HubEntry("advancement", Component.translatable("entry.liber_ivonis.advancement"),
                 Component.translatable("entry.liber_ivonis.advancement.description"),
-                openNative(() -> new AdvancementsScreen(Minecraft.getInstance().player.connection.getAdvancements())),
+                openNative(HubEntries::createAdvancementScreen),
                 true));
         entries.put("controls",
                 new HubEntry("controls", Component.translatable("entry.liber_ivonis.controls"),
                         Component.translatable("entry.liber_ivonis.controls.description"),
                         openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), true));
         return entries;
+    }
+
+    private static Screen createAdvancementScreen() {
+        Minecraft client = Minecraft.getInstance();
+        var advancements = client.player.connection.getAdvancements();
+        if (ModList.get().isLoaded("advancements_reloaded")) {
+            Screen reloaded = AdvancementsReloadedCompat.create(advancements, null);
+            if (reloaded != null)
+                return reloaded;
+        }
+        return new AdvancementsScreen(advancements);
     }
 
     private static void addConfiguredScreen(List<HubEntry> out, String value) {

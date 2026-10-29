@@ -81,3 +81,10 @@ type = "optional"
 versionRange = "[0,)"
 ordering = "AFTER"
 side = "CLIENT"
+
+[[dependencies."${mod_id}"]]
+modId = "advancements_reloaded"
+type = "optional"
+versionRange = "[0,)"
+ordering = "AFTER"
+side = "CLIENT"
