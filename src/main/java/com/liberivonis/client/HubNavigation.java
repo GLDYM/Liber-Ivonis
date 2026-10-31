@@ -1,9 +1,12 @@
 package com.liberivonis.client;
 
+import icyllis.modernui.fragment.Fragment;
+import icyllis.modernui.mc.MuiModApi;
+import icyllis.modernui.mc.MuiScreen;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 
-/** Handles the safe transition from ModernUI Hub to a native child screen. */
+/** Handles screen transitions while preserving the previous screen for Back/Esc. */
 public final class HubNavigation {
     private static boolean switchingToChild;
 
@@ -29,6 +32,27 @@ public final class HubNavigation {
         client.execute(() -> {
             client.setScreen(null);
             client.execute(action);
+        });
+    }
+
+    /** Opens a ModernUI fragment as a screen whose Back/Esc target is the current screen. */
+    public static void openModernScreen(Fragment fragment) {
+        Minecraft client = Minecraft.getInstance();
+        Screen previous = client.screen;
+        client.execute(() -> {
+            Screen screen = MuiModApi.get().createScreen(fragment, null, previous);
+            client.setScreen(screen);
+        });
+    }
+
+    /** Closes the current ModernUI screen and returns to the screen that opened it. */
+    public static void closeModernScreen() {
+        Minecraft client = Minecraft.getInstance();
+        Screen current = client.screen;
+        Screen previous = current instanceof MuiScreen muiScreen ? muiScreen.getPreviousScreen() : null;
+        client.execute(() -> {
+            if (client.screen == current)
+                client.setScreen(previous);
         });
     }
 }

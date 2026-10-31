@@ -1,6 +1,7 @@
 package com.liberivonis.client.screen;
 
 import com.liberivonis.client.HubNavigation;
+import com.liberivonis.client.HubLocalization;
 import icyllis.modernui.core.Context;
 import icyllis.modernui.fragment.Fragment;
 import icyllis.modernui.graphics.drawable.ColorDrawable;
@@ -15,6 +16,7 @@ import icyllis.modernui.widget.ScrollView;
 import icyllis.modernui.widget.TextView;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.util.List;
 
@@ -32,6 +34,7 @@ public final class HandbookCategoryFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, icyllis.modernui.util.DataSet state) {
         Context context = requireContext();
         HubColors colors = HubColors.current();
+        HubLocalization localization = HubLocalization.current();
         LinearLayout root = new LinearLayout(context);
         root.setOrientation(LinearLayout.VERTICAL);
         root.setPadding(root.dp(24), root.dp(22), root.dp(24), root.dp(18));
@@ -57,7 +60,7 @@ public final class HandbookCategoryFragment extends Fragment {
             }
             HandbookEntry entry = entries.get(i);
             Button button = new Button(context);
-            button.setText(entry.title().getString());
+            button.setText(localize(entry.title(), localization));
             button.setTextSize(15);
             button.setTextColor(colors.accent());
             button.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
@@ -73,13 +76,13 @@ public final class HandbookCategoryFragment extends Fragment {
                 new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         root.addView(scroll, new LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 0, 1));
         Button close = new Button(context);
-        close.setText(Component.translatable("screen.liber_ivonis.back").getString());
+        close.setText(localization.resolve("screen.liber_ivonis.back", "Back"));
         close.setTextSize(14);
         close.setTextColor(colors.accent());
         close.setPadding(close.dp(16), close.dp(6), close.dp(16), close.dp(6));
         close.setMinHeight(close.dp(36));
         close.setBackground(card(colors));
-        close.setOnClickListener(v -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(null)));
+        close.setOnClickListener(v -> HubNavigation.closeModernScreen());
         root.addView(close,
                 params(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT, 0, 14, 0, 0));
         return root;
@@ -92,6 +95,14 @@ public final class HandbookCategoryFragment extends Fragment {
         d.setColor(colors.surfaceAlt());
         d.setStroke(1, colors.outline());
         return d;
+    }
+
+    private static String localize(Component component, HubLocalization localization) {
+        if (component.getContents() instanceof TranslatableContents translatable
+                && translatable.getArgs().length == 0) {
+            return localization.resolve(translatable.getKey(), component.getString());
+        }
+        return component.getString();
     }
 
     private static LinearLayout.LayoutParams params(int w, int h, int l, int t, int r, int b) {

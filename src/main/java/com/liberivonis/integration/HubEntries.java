@@ -1,118 +1,93 @@
 package com.liberivonis.integration;
 
-import com.liberivonis.config.IvonisConfig;
+import com.liberivonis.client.HubLocalization;
+import com.liberivonis.client.HubNavigation;
+import com.liberivonis.client.screen.HandbookCategoryFragment;
+import com.liberivonis.client.screen.HandbookEntry;
 import com.liberivonis.compat.FtbQuestsCompat;
-import com.liberivonis.compat.PatchouliCompat;
 import com.liberivonis.compat.GuideMeCompat;
 import com.liberivonis.compat.AgeratumCompat;
 import com.liberivonis.compat.ModonomiconCompat;
+import com.liberivonis.compat.PatchouliCompat;
 import com.liberivonis.compat.AdvancementsReloadedCompat;
-import com.liberivonis.client.screen.HandbookCategoryFragment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.options.controls.KeyBindsScreen;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.neoforged.fml.ModList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import com.liberivonis.client.screen.HandbookEntry;
-import icyllis.modernui.mc.MuiModApi;
+import java.util.Optional;
 
 public final class HubEntries {
     private static final Logger LOGGER = LoggerFactory.getLogger("LiberIvonis/HubEntries");
 
-    public static List<HubEntry> collect() {
-        List<HubEntry> result = new ArrayList<>();
-        Map<String, HubEntry> builtins = builtins();
-        for (String value : IvonisConfig.hubEntries.get()) {
-            String[] spec = value.split("\\|", 2);
-            String id = spec[0].trim();
-            if (id.startsWith("item:")) {
-                addConfiguredItem(result, value.substring(5));
-                continue;
-            }
-            if (id.startsWith("screen:")) {
-                addConfiguredScreen(result, value.substring(7));
-                continue;
-            }
-            HubEntry entry = builtins.get(id);
-            if (entry != null && entry.available()) {
-                String category = spec.length > 1 ? spec[1].trim() : "";
-                result.add(category.isEmpty() ? entry
-                        : new HubEntry(entry.id(), entry.title(), entry.subtitle(), entry.action(), entry.available(),
-                                category));
-            }
-        }
-        return groupByCategory(result);
+    /** Returns a built-in Hub target, or {@code null} when the id is unknown. */
+    public static HubEntry builtin(String id) {
+        return builtins().get(id);
     }
 
-    private static List<HubEntry> groupByCategory(List<HubEntry> entries) {
-        Map<String, List<HubEntry>> groups = new LinkedHashMap<>();
-        for (HubEntry entry : entries)
-            groups.computeIfAbsent(entry.category(), ignored -> new ArrayList<>()).add(entry);
-        List<HubEntry> ordered = new ArrayList<>();
-        List<HubEntry> ungrouped = groups.remove("");
-        if (ungrouped != null)
-            ordered.addAll(ungrouped);
-        groups.values().forEach(ordered::addAll);
-        return ordered;
-    }
-
-    private static Map<String, HubEntry> builtins() {
+    public static Map<String, HubEntry> builtins() {
         Map<String, HubEntry> entries = new LinkedHashMap<>();
+        boolean inWorld = inWorld();
         entries.put("ftbquests",
-                new HubEntry("ftbquests", Component.translatable("entry.liber_ivonis.ftbquests"),
-                        Component.translatable("entry.liber_ivonis.ftbquests.description"),
-                        () -> FtbQuestsCompat.open(), ModList.get().isLoaded("ftbquests")));
+                new HubEntry("ftbquests", "entry.liber_ivonis.ftbquests", "FTB Quests",
+                        "entry.liber_ivonis.ftbquests.description", "Quest book",
+                        () -> FtbQuestsCompat.open(), ModList.get().isLoaded("ftbquests") && inWorld, true));
         boolean patchouliLoaded = ModList.get().isLoaded("patchouli");
-        entries.put("patchouli", new HubEntry("patchouli", Component.translatable("entry.liber_ivonis.patchouli"),
-                Component.translatable("entry.liber_ivonis.patchouli.description"), openCategory("patchouli",
-                        "entry.liber_ivonis.patchouli", patchouliLoaded ? PatchouliCompat.entries() : List.of()),
-                patchouliLoaded));
+        entries.put("patchouli", new HubEntry("patchouli", "entry.liber_ivonis.patchouli", "Patchouli",
+                "entry.liber_ivonis.patchouli.description", "Patchouli guide", openCategory("entry.liber_ivonis.patchouli",
+                        "Patchouli", patchouliLoaded ? PatchouliCompat.entries() : List.of()),
+                patchouliLoaded, false));
         boolean modonomiconLoaded = ModList.get().isLoaded("modonomicon");
         entries.put("modonomicon",
-                new HubEntry("modonomicon", Component.translatable("entry.liber_ivonis.modonomicon"),
-                        Component.translatable("entry.liber_ivonis.modonomicon.description"),
-                        openCategory("modonomicon", "entry.liber_ivonis.modonomicon",
+                new HubEntry("modonomicon", "entry.liber_ivonis.modonomicon", "Modonomicon",
+                        "entry.liber_ivonis.modonomicon.description", "Modonomicon guide",
+                        openCategory("entry.liber_ivonis.modonomicon", "Modonomicon",
                                 modonomiconLoaded ? ModonomiconCompat.entries() : List.of()),
-                        modonomiconLoaded));
+                        modonomiconLoaded, false));
         boolean guideMeLoaded = ModList.get().isLoaded("guideme");
         entries.put("guideme",
-                new HubEntry("guideme", Component.translatable("entry.liber_ivonis.guideme"),
-                        Component.translatable("entry.liber_ivonis.guideme.description"), openCategory("guideme",
-                                "entry.liber_ivonis.guideme", guideMeLoaded ? GuideMeCompat.entries() : List.of()),
-                        guideMeLoaded));
+                new HubEntry("guideme", "entry.liber_ivonis.guideme", "GuideME",
+                        "entry.liber_ivonis.guideme.description", "GuideME guide",
+                        openCategory("entry.liber_ivonis.guideme", "GuideME",
+                                guideMeLoaded ? GuideMeCompat.entries() : List.of()),
+                        guideMeLoaded, false));
         boolean ageratumLoaded = ModList.get().isLoaded("ageratum");
-        entries.put("ageratum", new HubEntry("ageratum", Component.translatable("entry.liber_ivonis.ageratum"),
-                Component.translatable("entry.liber_ivonis.ageratum.description"),
-                openCategory("ageratum", "entry.liber_ivonis.ageratum", ageratumLoaded ? List.of(
+        entries.put("ageratum", new HubEntry("ageratum", "entry.liber_ivonis.ageratum", "Ageratum",
+                "entry.liber_ivonis.ageratum.description", "Ageratum guide",
+                openCategory("entry.liber_ivonis.ageratum", "Ageratum", ageratumLoaded ? List.of(
                         new HandbookEntry(Component.translatable("entry.liber_ivonis.ageratum"), AgeratumCompat::open))
                         : List.of()),
-                ageratumLoaded));
+                ageratumLoaded, false));
         entries.put("inventory",
-                new HubEntry("inventory", Component.translatable("entry.liber_ivonis.inventory"),
-                        Component.translatable("entry.liber_ivonis.inventory.description"),
-                        openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), true));
-        entries.put("advancement", new HubEntry("advancement", Component.translatable("entry.liber_ivonis.advancement"),
-                Component.translatable("entry.liber_ivonis.advancement.description"),
+                new HubEntry("inventory", "entry.liber_ivonis.inventory", "Inventory",
+                        "entry.liber_ivonis.inventory.description", "View player inventory",
+                        openNative(() -> new InventoryScreen(Minecraft.getInstance().player)), inWorld, true));
+        entries.put("advancement", new HubEntry("advancement", "entry.liber_ivonis.advancement", "Advancements",
+                "entry.liber_ivonis.advancement.description", "View your advancements",
                 openNative(HubEntries::createAdvancementScreen),
-                true));
+                inWorld, true));
         entries.put("controls",
-                new HubEntry("controls", Component.translatable("entry.liber_ivonis.controls"),
-                        Component.translatable("entry.liber_ivonis.controls.description"),
-                        openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), true));
+                new HubEntry("controls", "entry.liber_ivonis.controls", "Key Bindings",
+                        "entry.liber_ivonis.controls.description", "Configure controls",
+                        openNative(() -> new KeyBindsScreen(null, Minecraft.getInstance().options)), inWorld, true));
         return entries;
+    }
+
+    private static boolean inWorld() {
+        Minecraft client = Minecraft.getInstance();
+        return client.player != null && client.level != null;
     }
 
     private static Screen createAdvancementScreen() {
@@ -126,37 +101,56 @@ public final class HubEntries {
         return new AdvancementsScreen(advancements);
     }
 
-    private static void addConfiguredScreen(List<HubEntry> out, String value) {
-        String[] p = value.split("\\|", 4);
-        if (p.length < 2)
-            return;
-        String className = p[0].trim();
-        String method = !p[1].isBlank() ? p[1].trim() : "create";
-        String title = p.length >= 3 ? p[2].trim() : "";
-        String category = p.length >= 4 && !p[3].isBlank() ? p[3].trim() : "";
-        if (!className.isBlank())
-            out.add(new HubEntry(
-                    "custom:" + className,
-                    title.isBlank() ? Component.literal(className) : configurableTitle(title),
-                    Component.translatable("entry.liber_ivonis.configured_screen.description"),
-                    () -> openScreen(invokeScreen(className, method)).run(),
-                    true, category));
+    public static HubEntry screen(String className, String method, String titleKey, String titleFallback,
+            String descriptionKey, String descriptionFallback) {
+        if (className == null || className.isBlank())
+            throw new IllegalArgumentException("Screen class cannot be blank");
+        String actualMethod = method == null || method.isBlank() ? "create" : method.trim();
+        String actualTitle = titleFallback == null || titleFallback.isBlank()
+                ? className.substring(className.lastIndexOf('.') + 1)
+                : titleFallback;
+        return new HubEntry(
+                "custom:" + className + "#" + actualMethod,
+                titleKey == null ? "" : titleKey,
+                actualTitle,
+                descriptionKey == null || descriptionKey.isBlank()
+                        ? "entry.liber_ivonis.configured_screen.description"
+                        : descriptionKey,
+                descriptionFallback == null || descriptionFallback.isBlank()
+                        ? "Configured screen"
+                        : descriptionFallback,
+                () -> openScreen(invokeScreen(className, actualMethod)).run(),
+                true, false);
     }
 
-    private static void addConfiguredItem(List<HubEntry> out, String value) {
-        String[] p = value.split("\\|", 3);
-        if (p.length == 0)
-            return;
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(p[0]));
-        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
-            return;
-        Component title = p.length > 1 ? configurableTitle(p[1]) : item.getName(item.getDefaultInstance());
-        String category = p.length > 2 ? p[2].trim() : "";
-        out.add(new HubEntry("item:" + p[0], title,
-                Component.translatable("entry.liber_ivonis.configured_handbook.description"), () -> useHandbook(item),
-                true, category));
+    public static Optional<HubEntry> item(String itemId, String titleKey, String titleFallback,
+            String descriptionKey, String descriptionFallback) {
+        final ResourceLocation location;
+        try {
+            location = ResourceLocation.parse(itemId);
+        } catch (RuntimeException exception) {
+            LOGGER.warn("Ignoring Hub entry with invalid item id '{}'", itemId, exception);
+            return Optional.empty();
+        }
+        Item item = BuiltInRegistries.ITEM.get(location);
+        if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey())) {
+            LOGGER.warn("Ignoring Hub entry because item '{}' is not registered", location);
+            return Optional.empty();
+        }
+        String fallback = titleFallback == null || titleFallback.isBlank()
+                ? item.getName(item.getDefaultInstance()).getString()
+                : titleFallback;
+        return Optional.of(new HubEntry("item:" + location,
+                titleKey == null ? "" : titleKey,
+                fallback,
+                descriptionKey == null || descriptionKey.isBlank()
+                        ? "entry.liber_ivonis.configured_handbook.description"
+                        : descriptionKey,
+                descriptionFallback == null || descriptionFallback.isBlank()
+                        ? "Configured handbook"
+                        : descriptionFallback,
+                () -> useHandbook(item), true, true));
     }
-
 
     private static Screen useHandbook(Item item) {
         if (item == BuiltInRegistries.ITEM.get(BuiltInRegistries.ITEM.getDefaultKey()))
@@ -178,14 +172,9 @@ public final class HubEntries {
         };
     }
 
-    private static Runnable openCategory(String id, String titleKey, List<HandbookEntry> entries) {
-        return () -> MuiModApi.openScreen(new HandbookCategoryFragment(Component.translatable(titleKey), entries));
-    }
-
-    private static Component configurableTitle(String value) {
-        return value.startsWith("key:") && value.length() > 4
-                ? Component.translatable(value.substring(4))
-                : Component.literal(value);
+    private static Runnable openCategory(String titleKey, String fallback, List<HandbookEntry> entries) {
+        return () -> HubNavigation.openModernScreen(new HandbookCategoryFragment(
+                HubLocalization.current().component(titleKey, fallback), entries));
     }
 
     private static Runnable openNative(java.util.function.Supplier<Screen> supplier) {

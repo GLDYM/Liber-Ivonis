@@ -1,6 +1,7 @@
 package com.liberivonis.client;
 
 import com.liberivonis.LiberIvonis;
+import com.liberivonis.config.HubConfigFiles;
 import com.liberivonis.registry.ModItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -29,6 +30,7 @@ public final class ClientEventHandlers {
 
     @SubscribeEvent
     public static void clientSetup(net.neoforged.fml.event.lifecycle.FMLClientSetupEvent event) {
+        event.enqueueWork(HubConfigFiles::ensureDefaults);
         if (ModList.get().isLoaded("ftblibrary"))
             event.enqueueWork(com.liberivonis.compat.FtbLibraryCompat::init);
     }

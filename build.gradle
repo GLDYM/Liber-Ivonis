@@ -47,6 +47,12 @@ dependencies {
     implementation 'org.appliedenergistics:guideme:21.1.15'
     // Optional compatibility target: replaces the vanilla advancements screen.
     compileOnly 'curse.maven:advancements-reloaded-1113876:5835520'
+
+    testImplementation platform('org.junit:junit-bom:5.10.3')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'com.google.code.gson:gson:2.11.0'
+    testImplementation 'org.slf4j:slf4j-api:2.0.16'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -60,3 +66,4 @@ tasks.named('processResources', ProcessResources).configure {
 
 publishing { publications { register('mavenJava', MavenPublication) { from components.java } } }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+tasks.named('test').configure { useJUnitPlatform() }

@@ -1,25 +1,23 @@
 package com.liberivonis.client.screen;
 
-import com.liberivonis.config.IvonisConfig;
+import com.liberivonis.config.layout.HubLayoutLoader;
+import com.liberivonis.config.layout.HubTheme;
 
 /** Resolved client-side colour palette for the Hub UI. */
 record HubColors(int background, int surface, int surfaceAlt, int accent, int muted, int outline,
         int disabledOutline) {
     static HubColors current() {
-        return new HubColors(
-                parse(IvonisConfig.hubBackground.get()),
-                parse(IvonisConfig.hubSurface.get()),
-                parse(IvonisConfig.hubSurfaceAlt.get()),
-                parse(IvonisConfig.hubAccent.get()),
-                parse(IvonisConfig.hubMuted.get()),
-                parse(IvonisConfig.hubOutline.get()),
-                parse(IvonisConfig.hubDisabledOutline.get()));
+        return from(HubLayoutLoader.load().theme());
     }
 
-    private static int parse(String value) {
-        String hex = value.substring(1);
-        if (hex.length() == 6)
-            hex = "FF" + hex;
-        return (int) Long.parseLong(hex, 16);
+    static HubColors from(HubTheme theme) {
+        return new HubColors(
+                theme.background(),
+                theme.surface(),
+                theme.surfaceAlt(),
+                theme.accent(),
+                theme.muted(),
+                theme.outline(),
+                theme.disabledOutline());
     }
 }

@@ -17,7 +17,6 @@ public final class LiberIvonis {
 
     public LiberIvonis(IEventBus modEventBus, ModContainer container) {
         ModItems.ITEMS.register(modEventBus);
-        container.registerConfig(ModConfig.Type.CLIENT, IvonisConfig.CLIENT_SPEC);
         container.registerConfig(ModConfig.Type.COMMON, IvonisConfig.COMMON_SPEC);
         if (FMLEnvironment.dist == Dist.CLIENT)
             com.liberivonis.client.ClientConfigScreen.register(container);

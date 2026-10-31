@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "theme": {
+    "background": "#FF0D0F15",
+    "surface": "#FF171A23",
+    "surfaceAlt": "#FF2E3547",
+    "accent": "#FFF2F5F9",
+    "muted": "#FFAEB8C6",
+    "outline": "#FF7FD9F5",
+    "disabledOutline": "#FF2B3244"
+  },
+  "layout": {
+    "type": "column",
+    "width": "match_parent",
+    "height": "match_parent",
+    "padding": [24, 22, 24, 18],
+    "background": "background",
+    "children": [
+      {
+        "type": "text",
+        "text": "screen.liber_ivonis.hub",
+        "fallback": "Liber Ivonis",
+        "size": 22,
+        "color": "accent",
+        "width": "match_parent",
+        "margin": [0, 0, 0, 3]
+      },
+      {
+        "type": "text",
+        "text": "screen.liber_ivonis.subtitle",
+        "fallback": "Knowledge at your fingertips",
+        "size": 13,
+        "color": "muted",
+        "width": "match_parent",
+        "margin": [0, 0, 0, 16]
+      },
+      {
+        "type": "scroll",
+        "weight": 1,
+        "fillViewport": true,
+        "children": [
+          {
+            "type": "grid",
+            "columns": 2,
+            "gap": 8,
+            "width": "match_parent",
+            "children": [
+              {"type": "entry", "builtin": "ftbquests"},
+              {"type": "entry", "builtin": "patchouli"},
+              {"type": "entry", "builtin": "modonomicon"},
+              {"type": "entry", "builtin": "guideme"},
+              {"type": "entry", "builtin": "ageratum"},
+              {"type": "entry", "builtin": "inventory"},
+              {"type": "entry", "builtin": "advancement"},
+              {"type": "entry", "builtin": "controls"}
+            ]
+          }
+        ]
+      },
+      {
+        "type": "button",
+        "action": "close",
+        "text": "screen.liber_ivonis.back",
+        "fallback": "Back",
+        "width": "match_parent",
+        "margin": [0, 14, 0, 0]
+      }
+    ]
+  }
+}
