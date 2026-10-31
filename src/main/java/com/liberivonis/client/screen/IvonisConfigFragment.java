@@ -97,8 +97,8 @@ public final class IvonisConfigFragment extends Fragment {
         Button editLayout = button(context, localization, "screen.liber_ivonis.settings.open_layout",
                 "Edit hub.json", colors);
         editLayout.setOnClickListener(view -> openPath(HubConfigFiles.layoutPath(), status, localization));
-        fileActions.addView(openFolder, weightedParams(0, 0, 0, 4));
-        fileActions.addView(editLayout, weightedParams(4, 0, 0, 0));
+        fileActions.addView(openFolder, weightedParams(fileActions, 0, 0, 0, 4));
+        fileActions.addView(editLayout, weightedParams(fileActions, 4, 0, 0, 0));
         content.addView(fileActions, params(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0, 6));
 
@@ -110,8 +110,8 @@ public final class IvonisConfigFragment extends Fragment {
         Button preview = button(context, localization, "screen.liber_ivonis.settings.preview",
                 "Preview Hub", colors);
         preview.setOnClickListener(view -> HubNavigation.openModernScreen(new IvonisHubFragment(true)));
-        previewActions.addView(reload, weightedParams(0, 0, 0, 4));
-        previewActions.addView(preview, weightedParams(4, 0, 0, 0));
+        previewActions.addView(reload, weightedParams(previewActions, 0, 0, 0, 4));
+        previewActions.addView(preview, weightedParams(previewActions, 4, 0, 0, 0));
         content.addView(previewActions, params(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 0, 0, 0,
                 Minecraft.getInstance().player == null ? 4 : 14));
@@ -159,8 +159,8 @@ public final class IvonisConfigFragment extends Fragment {
                 view -> Minecraft.getInstance().execute(() -> Minecraft.getInstance().setScreen(parent)));
         Button save = button(context, localization, "screen.liber_ivonis.settings.save", "Save", colors);
         save.setOnClickListener(view -> Minecraft.getInstance().execute(() -> save(giveBook, parent)));
-        actions.addView(back, weightedParams(0, 0, 0, 4));
-        actions.addView(save, weightedParams(4, 0, 0, 0));
+        actions.addView(back, weightedParams(actions, 0, 0, 0, 4));
+        actions.addView(save, weightedParams(actions, 4, 0, 0, 0));
         root.addView(actions, params(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 0, 14, 0, 0));
         return root;
@@ -274,10 +274,10 @@ public final class IvonisConfigFragment extends Fragment {
         return shape;
     }
 
-    private static LinearLayout.LayoutParams weightedParams(int left, int top, int right, int bottom) {
+    private static LinearLayout.LayoutParams weightedParams(View anchor, int left, int top, int right, int bottom) {
         LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,
                 ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-        params.setMargins(left, top, right, bottom);
+        params.setMargins(anchor.dp(left), anchor.dp(top), anchor.dp(right), anchor.dp(bottom));
         return params;
     }
 

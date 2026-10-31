@@ -149,15 +149,16 @@ final class HubLayoutViewBuilder {
                     View placeholder = new View(context);
                     LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(0,
                             ViewGroup.LayoutParams.WRAP_CONTENT, 1);
-                    params.setMargins(column == 0 ? 0 : node.gap() / 2, 0,
-                            column == columns - 1 ? 0 : node.gap() / 2, 0);
+                    int halfGap = dp(row, node.gap() / 2);
+                    params.setMargins(column == 0 ? 0 : halfGap, 0,
+                            column == columns - 1 ? 0 : halfGap, 0);
                     row.addView(placeholder, params);
                 }
             }
             LinearLayout.LayoutParams rowParams = new LinearLayout.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT);
-            rowParams.setMargins(0, 0, 0, rowIndex == rows - 1 ? 0 : node.gap());
+            rowParams.setMargins(0, 0, 0, rowIndex == rows - 1 ? 0 : dp(grid, node.gap()));
             grid.addView(row, rowParams);
             equalizeRowHeight(row);
         }
@@ -294,9 +295,10 @@ final class HubLayoutViewBuilder {
             int layoutGravity = gravity(style.gravity(), 0);
             if (layoutGravity != 0)
                 params.gravity = layoutGravity;
+            int layoutGap = dp(parent, gapBefore);
             params.setMargins(
-                    dp(parent, margins.left()) + (vertical ? 0 : gapBefore),
-                    dp(parent, margins.top()) + (vertical ? gapBefore : 0),
+                    dp(parent, margins.left()) + (vertical ? 0 : layoutGap),
+                    dp(parent, margins.top()) + (vertical ? layoutGap : 0),
                     dp(parent, margins.right()),
                     dp(parent, margins.bottom()));
             return params;
@@ -319,10 +321,11 @@ final class HubLayoutViewBuilder {
         if (layoutGravity != 0)
             params.gravity = layoutGravity;
         Insets margins = style.margin();
+        int halfGap = dp(parent, gap / 2);
         params.setMargins(
-                dp(parent, margins.left()) + (column == 0 ? 0 : gap / 2),
+                dp(parent, margins.left()) + (column == 0 ? 0 : halfGap),
                 dp(parent, margins.top()),
-                dp(parent, margins.right()) + (column == columns - 1 ? 0 : gap / 2),
+                dp(parent, margins.right()) + (column == columns - 1 ? 0 : halfGap),
                 dp(parent, margins.bottom()));
         return params;
     }
