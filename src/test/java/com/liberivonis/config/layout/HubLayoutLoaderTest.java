@@ -4,6 +4,7 @@ import com.liberivonis.config.layout.HubLayout.ContainerNode;
 import com.liberivonis.config.layout.HubLayout.ContainerType;
 import com.liberivonis.config.layout.HubLayout.EntryNode;
 import com.liberivonis.config.layout.HubLayout.Orientation;
+import com.liberivonis.config.layout.HubLayout.TextNode;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -21,17 +22,64 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class HubLayoutLoaderTest {
     @Test
     void bundledLayoutParses() throws Exception {
-        try (InputStream input = getClass().getResourceAsStream("/liber_ivonis/defaults/hub.json")) {
+        HubLayout layout = bundledLayout();
+        ContainerNode root = assertInstanceOf(ContainerNode.class, layout.root());
+        assertEquals(ContainerType.LINEAR, root.type());
+        assertEquals(Orientation.VERTICAL, root.orientation());
+        assertEquals(4, root.children().size());
+        assertEquals(HubTheme.defaults(), layout.theme());
+    }
+
+    @Test
+    void bundledLayoutKeepsMigratedCategoriesAndScreens() throws Exception {
+        ContainerNode root = assertInstanceOf(ContainerNode.class, bundledLayout().root());
+        ContainerNode scroll = assertInstanceOf(ContainerNode.class, root.children().get(2));
+        assertEquals(4, scroll.children().size());
+
+        String[] categoryKeys = {
+                "screen.liber_ivonis.category.base",
+                "screen.liber_ivonis.category.task",
+                "screen.liber_ivonis.category.handbook",
+                "screen.liber_ivonis.category.narcissus"
+        };
+        for (int index = 0; index < categoryKeys.length; index++) {
+            ContainerNode section = assertInstanceOf(ContainerNode.class, scroll.children().get(index));
+            TextNode heading = assertInstanceOf(TextNode.class, section.children().getFirst());
+            assertEquals(categoryKeys[index], heading.text());
+            assertInstanceOf(ContainerNode.class, section.children().get(1));
+        }
+
+        EntryNode keymap = entryAt(scroll, 0, 1);
+        assertEquals("com.github.einjerjar.mc.keymap.client.gui.screen.KeymapScreen", keymap.target());
+        assertEquals("<init>", keymap.method());
+        assertEquals("entry.liber_ivonis.keymap", keymap.title());
+        assertEquals("entry.liber_ivonis.keymap.description", keymap.description());
+
+        EntryNode waypoints = entryAt(scroll, 3, 0);
+        assertEquals("xin.vanilla.narcissus.integration.ScreenHelper", waypoints.target());
+        assertEquals("openScreen", waypoints.method());
+        assertEquals("entry.liber_ivonis.narcissus.waypoints", waypoints.title());
+        assertEquals("entry.liber_ivonis.narcissus.waypoints.description", waypoints.description());
+
+        EntryNode accessList = entryAt(scroll, 3, 1);
+        assertEquals("openAccessListScreen", accessList.method());
+        assertEquals("entry.liber_ivonis.narcissus.access_list", accessList.title());
+        assertEquals("entry.liber_ivonis.narcissus.access_list.description", accessList.description());
+    }
+
+    private static HubLayout bundledLayout() throws Exception {
+        try (InputStream input = HubLayoutLoaderTest.class.getResourceAsStream("/liber_ivonis/defaults/hub.json")) {
             if (input == null)
                 throw new IOException("Bundled Hub layout is missing");
-            HubLayout layout = HubLayoutLoader.parse(
+            return HubLayoutLoader.parse(
                     new InputStreamReader(input, StandardCharsets.UTF_8), "bundled default");
-            ContainerNode root = assertInstanceOf(ContainerNode.class, layout.root());
-            assertEquals(ContainerType.LINEAR, root.type());
-            assertEquals(Orientation.VERTICAL, root.orientation());
-            assertEquals(4, root.children().size());
-            assertEquals(HubTheme.defaults(), layout.theme());
         }
+    }
+
+    private static EntryNode entryAt(ContainerNode scroll, int sectionIndex, int entryIndex) {
+        ContainerNode section = assertInstanceOf(ContainerNode.class, scroll.children().get(sectionIndex));
+        ContainerNode grid = assertInstanceOf(ContainerNode.class, section.children().get(1));
+        return assertInstanceOf(EntryNode.class, grid.children().get(entryIndex));
     }
 
     @Test

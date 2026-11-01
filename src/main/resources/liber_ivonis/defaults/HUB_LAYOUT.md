@@ -5,7 +5,7 @@ the Hub opens, so layout and translation changes do not need a game restart.
 If the JSON is invalid, the bundled default is shown and the parse error is
 written to the game log.
 
-The ModernUI settings page shows the active file paths, layout validation
+The In-game settings page shows the active file paths, layout validation
 status, and theme palette. It can open the config/language folders, reload the
 files, and open a live Hub preview without leaving the game. In preview mode,
 entries that need a loaded player/world remain visible but are disabled.
@@ -21,9 +21,6 @@ The lookup order for text in this layout is:
 
 This means a translation key can be edited in the local `lang` directory
 without replacing the mod JAR or creating a resource pack.
-
-The old `liber_ivonis-client.toml` is no longer read. Move custom entries and
-colours from that file into this JSON document.
 
 ## Document
 
@@ -111,8 +108,8 @@ An entry must contain exactly one target:
   `inventory`, `advancement`, or `controls`.
 - `item`: an item registry id. The item name is used when `title` is omitted.
 - `screen`: a screen factory class. The method is static and should accept
-  supported client objects or no parameters. The class name is used when
-  `title` is omitted.
+  supported client objects, `boolean` parameters (injected as `false`), or no
+  parameters. The class name is used when `title` is omitted.
 
 Optional entry properties:
 

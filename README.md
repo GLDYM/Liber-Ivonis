@@ -39,10 +39,9 @@ config/
         └── zh_tw.json
 ```
 
-`hub.json` defines the Hub with nested ModernUI-style containers and widgets.
-`column`, `row`, `scroll`, `grid`, `text`, `entry`, `button`, and `spacer`
-nodes can be freely nested. Entries use explicit fields instead of a packed
-string list:
+`hub.json` defines the Hub with nested ModernUI-style containers and widgets. `column`, `row`, `scroll`, `grid`, `text`, `entry`, `button`, and `spacer` nodes can be freely nested. Entries use explicit fields instead of a packed string list. The generated `config/liber_ivonis/README.md` documents every supported node, dimension, colour and entry field.
+
+Layout and language JSON files are re-read whenever the Hub opens. If `hub.json` is invalid, the bundled layout is used and the error is logged. 
 
 ```json
 {
@@ -88,14 +87,9 @@ string list:
 }
 ```
 
-Layout and language JSON files are re-read whenever the Hub opens. If
-`hub.json` is invalid, the bundled layout is used and the error is logged.
-The generated `config/liber_ivonis/README.md` documents every supported node,
-dimension, colour and entry field.
-The in-game ModernUI settings page shows layout validation status and theme
-preview, and provides buttons to open the config folder, reload the file, or
-preview the resulting Hub. Preview mode keeps world-dependent entries visible
-but disabled when no player/world is loaded.
+![config](./README/config.png)
+
+The in-game ModernUI settings page shows layout validation status and theme preview, and provides buttons to open the config folder, reload the file, or preview the resulting Hub. Preview mode keeps world-dependent entries visible but disabled when no player/world is loaded.
 
 Configured translation keys are resolved in this order:
 
@@ -104,17 +98,9 @@ Configured translation keys are resolved in this order:
 3. Minecraft's loaded language resources.
 4. The node's `fallback`.
 
-ModernUI 3.13 does not expose a public XML layout inflater. Liber Ivonis
-therefore uses a JSON description that is translated into native ModernUI
-views rather than injecting a separate rendering implementation.
-
-The Hub layout and its seven theme colours live entirely in `hub.json`. The
-only remaining TOML file is the server-side gameplay setting:
+The only remaining TOML file is the server-side gameplay setting:
 
 ```toml
 [gameplay]
 giveBookOnStart = true
 ```
-
-Older `liber_ivonis-client.toml` files are no longer read or generated. Custom
-entries from that file must be moved into `hub.json`.

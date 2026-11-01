@@ -209,7 +209,7 @@ public final class HubEntries {
                     if (!method.getName().equals(methodName)
                             || !java.lang.reflect.Modifier.isStatic(method.getModifiers()))
                         continue;
-                    Object[] args = resolveArguments(method.getParameterTypes(), commonArgs);
+                    Object[] args = ScreenArgumentResolver.resolve(method.getParameterTypes(), commonArgs);
                     if (args == null)
                         continue;
                     // LOGGER.info("Invoking {}.{} with {} parameter(s)", className, methodName,
@@ -225,7 +225,7 @@ public final class HubEntries {
             // LOGGER.info("Inspecting {} constructor(s) for {}", constructors.length,
             // className);
             for (java.lang.reflect.Constructor<?> constructor : constructors) {
-                Object[] args = resolveArguments(constructor.getParameterTypes(), commonArgs);
+                Object[] args = ScreenArgumentResolver.resolve(constructor.getParameterTypes(), commonArgs);
                 if (args == null) {
                     LOGGER.warn("Skipping unsupported constructor {}", constructor);
                     continue;
@@ -246,28 +246,6 @@ public final class HubEntries {
             LOGGER.error("Failed to create custom screen {} using {}", className, preferredMethod, e);
         }
         return null;
-    }
-
-    private static Object[] resolveArguments(Class<?>[] parameterTypes, Object[] commonArgs) {
-        Object[] result = new Object[parameterTypes.length];
-        boolean[] used = new boolean[commonArgs.length];
-        for (int i = 0; i < parameterTypes.length; i++) {
-            boolean found = false;
-            for (int j = 0; j < commonArgs.length; j++) {
-                Object value = commonArgs[j];
-                if (used[j] || (value != null && !parameterTypes[i].isInstance(value)))
-                    continue;
-                if (value == null && parameterTypes[i].isPrimitive())
-                    continue;
-                result[i] = value;
-                used[j] = true;
-                found = true;
-                break;
-            }
-            if (!found)
-                return null;
-        }
-        return result;
     }
 
 }

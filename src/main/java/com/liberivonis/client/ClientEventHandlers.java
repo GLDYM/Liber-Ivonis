@@ -18,7 +18,7 @@ import net.neoforged.fml.ModList;
 @EventBusSubscriber(modid = LiberIvonis.MOD_ID, value = Dist.CLIENT)
 public final class ClientEventHandlers {
     public static final KeyMapping OPEN_HUB = new KeyMapping("key.liber_ivonis.open_hub", InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_UNKNOWN, "key.categories.liber_ivonis");
+            GLFW.GLFW_KEY_K, "key.categories.liber_ivonis");
 
     private ClientEventHandlers() {
     }
